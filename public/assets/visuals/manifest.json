@@ -1,0 +1,289 @@
+{
+  "originalSize": [
+    3840,
+    2160
+  ],
+  "authoring": "Original procedural Blender scenes",
+  "assets": [
+    {
+      "scene": "hero",
+      "width": 640,
+      "height": 360,
+      "format": "webp",
+      "bytes": 7260
+    },
+    {
+      "scene": "hero",
+      "width": 640,
+      "height": 360,
+      "format": "avif",
+      "bytes": 4089
+    },
+    {
+      "scene": "hero",
+      "width": 1280,
+      "height": 720,
+      "format": "webp",
+      "bytes": 17538
+    },
+    {
+      "scene": "hero",
+      "width": 1280,
+      "height": 720,
+      "format": "avif",
+      "bytes": 9257
+    },
+    {
+      "scene": "hero",
+      "width": 1920,
+      "height": 1080,
+      "format": "webp",
+      "bytes": 29176
+    },
+    {
+      "scene": "hero",
+      "width": 1920,
+      "height": 1080,
+      "format": "avif",
+      "bytes": 14500
+    },
+    {
+      "scene": "hero",
+      "width": 3840,
+      "height": 2160,
+      "format": "webp",
+      "bytes": 69828
+    },
+    {
+      "scene": "hero",
+      "width": 3840,
+      "height": 2160,
+      "format": "avif",
+      "bytes": 30719
+    },
+    {
+      "scene": "company",
+      "width": 640,
+      "height": 360,
+      "format": "webp",
+      "bytes": 16048
+    },
+    {
+      "scene": "company",
+      "width": 640,
+      "height": 360,
+      "format": "avif",
+      "bytes": 6602
+    },
+    {
+      "scene": "company",
+      "width": 1280,
+      "height": 720,
+      "format": "webp",
+      "bytes": 39800
+    },
+    {
+      "scene": "company",
+      "width": 1280,
+      "height": 720,
+      "format": "avif",
+      "bytes": 15791
+    },
+    {
+      "scene": "company",
+      "width": 1920,
+      "height": 1080,
+      "format": "webp",
+      "bytes": 66430
+    },
+    {
+      "scene": "company",
+      "width": 1920,
+      "height": 1080,
+      "format": "avif",
+      "bytes": 25962
+    },
+    {
+      "scene": "company",
+      "width": 3840,
+      "height": 2160,
+      "format": "webp",
+      "bytes": 152862
+    },
+    {
+      "scene": "company",
+      "width": 3840,
+      "height": 2160,
+      "format": "avif",
+      "bytes": 62080
+    },
+    {
+      "scene": "research",
+      "width": 640,
+      "height": 360,
+      "format": "webp",
+      "bytes": 10406
+    },
+    {
+      "scene": "research",
+      "width": 640,
+      "height": 360,
+      "format": "avif",
+      "bytes": 6930
+    },
+    {
+      "scene": "research",
+      "width": 1280,
+      "height": 720,
+      "format": "webp",
+      "bytes": 25014
+    },
+    {
+      "scene": "research",
+      "width": 1280,
+      "height": 720,
+      "format": "avif",
+      "bytes": 16073
+    },
+    {
+      "scene": "research",
+      "width": 1920,
+      "height": 1080,
+      "format": "webp",
+      "bytes": 40860
+    },
+    {
+      "scene": "research",
+      "width": 1920,
+      "height": 1080,
+      "format": "avif",
+      "bytes": 25372
+    },
+    {
+      "scene": "research",
+      "width": 3840,
+      "height": 2160,
+      "format": "webp",
+      "bytes": 94700
+    },
+    {
+      "scene": "research",
+      "width": 3840,
+      "height": 2160,
+      "format": "avif",
+      "bytes": 52710
+    },
+    {
+      "scene": "engineering",
+      "width": 640,
+      "height": 360,
+      "format": "webp",
+      "bytes": 7516
+    },
+    {
+      "scene": "engineering",
+      "width": 640,
+      "height": 360,
+      "format": "avif",
+      "bytes": 4690
+    },
+    {
+      "scene": "engineering",
+      "width": 1280,
+      "height": 720,
+      "format": "webp",
+      "bytes": 18354
+    },
+    {
+      "scene": "engineering",
+      "width": 1280,
+      "height": 720,
+      "format": "avif",
+      "bytes": 10477
+    },
+    {
+      "scene": "engineering",
+      "width": 1920,
+      "height": 1080,
+      "format": "webp",
+      "bytes": 31158
+    },
+    {
+      "scene": "engineering",
+      "width": 1920,
+      "height": 1080,
+      "format": "avif",
+      "bytes": 16890
+    },
+    {
+      "scene": "engineering",
+      "width": 3840,
+      "height": 2160,
+      "format": "webp",
+      "bytes": 76310
+    },
+    {
+      "scene": "engineering",
+      "width": 3840,
+      "height": 2160,
+      "format": "avif",
+      "bytes": 36346
+    },
+    {
+      "scene": "closing",
+      "width": 640,
+      "height": 360,
+      "format": "webp",
+      "bytes": 6010
+    },
+    {
+      "scene": "closing",
+      "width": 640,
+      "height": 360,
+      "format": "avif",
+      "bytes": 3556
+    },
+    {
+      "scene": "closing",
+      "width": 1280,
+      "height": 720,
+      "format": "webp",
+      "bytes": 14250
+    },
+    {
+      "scene": "closing",
+      "width": 1280,
+      "height": 720,
+      "format": "avif",
+      "bytes": 7471
+    },
+    {
+      "scene": "closing",
+      "width": 1920,
+      "height": 1080,
+      "format": "webp",
+      "bytes": 24094
+    },
+    {
+      "scene": "closing",
+      "width": 1920,
+      "height": 1080,
+      "format": "avif",
+      "bytes": 11567
+    },
+    {
+      "scene": "closing",
+      "width": 3840,
+      "height": 2160,
+      "format": "webp",
+      "bytes": 60452
+    },
+    {
+      "scene": "closing",
+      "width": 3840,
+      "height": 2160,
+      "format": "avif",
+      "bytes": 24980
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+node_modules/
+.tools/
+.sites-runtime/
+dist/
+artifacts/
+.openai/brand-preview/
+.env
+.env.*
+!.env.example
+*.tar.gz
+*.zip
+docs/irium-labs-website-copy.md
+docs/irium-labs-company-disclosures.md

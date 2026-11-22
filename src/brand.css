@@ -1,0 +1,4 @@
+/* Official outlined identity, adapted only in viewBox and layout. */
+.brand .brand-lockup{width:208px;height:auto;max-height:42px;object-fit:contain;object-position:left}
+.footer-wordmark img{width:100%;height:auto;max-height:220px;object-fit:contain;object-position:left}
+@media(max-width:640px){.brand .brand-lockup{width:174px;max-height:35px}.footer-wordmark img{max-height:80px}}

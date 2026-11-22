@@ -1,0 +1,29 @@
+import { company, type PublicPage } from './data.ts';
+import { escapeHtml as esc, arrowRight, arrowUp, playIcon, link } from './components.ts';
+import { renderPrimaryPage } from './page-content.ts';
+import { renderLegalPage } from './legal-content.ts';
+
+export const organizationJson = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: company.name, legalName: company.legalName, url: company.domain, email: company.email, foundingDate: company.incorporationDate, identifier: company.cin, description: company.description, address: { '@type': 'PostalAddress', addressCountry: 'IN' } }).replace(/</g, '\\u003c');
+const navLinks = [['Company','/about/'],['Products','/products/'],['Technology','/research/']] as const;
+
+/** Version every local asset reference, including each responsive image candidate. */
+function versionAssets(html: string, version?: string): string {
+  if (!version || !/^[a-f0-9]{12,64}$/.test(version)) return html;
+  return html.replace(/\b(src|href|srcset)="([^"]*)"/g, (_match, attribute: string, value: string) => {
+    const updated = value.replace(/(^|,\s*)(\/(?:assets|fonts)\/[^\s,?#]+)(?=\s|$)/g, (_candidate: string, prefix: string, path: string) => `${prefix}${path}?v=${version}`);
+    return `${attribute}="${updated}"`;
+  });
+}
+
+export function renderPage(page: PublicPage, options: { siteUrl?: string; publicLaunch?: boolean; assetVersion?: string } = {}): string {
+  const origin = (options.siteUrl ?? company.domain).replace(/\/$/, '');
+  const canonical = origin + page.path;
+  const indexable = options.publicLaunch === true && page.path !== '/404.html';
+  const legal = renderLegalPage(page.path);
+  const body = legal ?? renderPrimaryPage(page.path);
+  return versionAssets(`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="theme-color" content="#f0f2ef"><title>${esc(page.title)}</title><meta name="description" content="${esc(page.description)}"><meta name="robots" content="${indexable?'index,follow':'noindex,nofollow'}"><link rel="canonical" href="${esc(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Irium Labs"><meta property="og:title" content="${esc(page.title)}"><meta property="og:description" content="${esc(page.description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:image" content="${esc(origin)}/assets/social.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Irium Labs. Original software. Independent thinking. A wider horizon."><meta name="twitter:card" content="summary_large_image"><link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"><link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/main.css"><script type="application/ld+json">${organizationJson}</script><script type="module" src="/assets/main.js"></script></head>
+<body class="${legal === null ? 'public-page' : 'policy-page'}" data-page="${esc(page.path)}"><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="wrap header-inner"><a class="brand" href="/" aria-label="Irium Labs home"><img class="brand-lockup" src="/assets/brand-horizontal.svg" width="340" height="64" alt="Irium Labs"></a><nav id="site-nav" class="site-nav" aria-label="Main navigation">${navLinks.map(([text,path])=>`<a href="${path}"${page.path===path?' aria-current="page"':''}>${text}</a>`).join('')}${link('Contact','/contact/',`nav-contact${page.path==='/contact/'?' is-current':''}`)}</nav><button class="effects-toggle" type="button" aria-pressed="false" aria-label="Enable visual effects" data-motion><span class="effects-indicator" aria-hidden="true"></span><span class="effects-label">Enable effects</span><span class="pause-symbol" aria-hidden="true">${playIcon}</span></button><button class="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav" data-menu><span>Menu</span><svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M0 4h22M0 12h22" stroke="currentColor" stroke-width="1.5"/></svg></button></div></header>
+<main id="main" tabindex="-1">${body}</main>
+<footer class="site-footer"><div class="wrap"><div class="footer-top"><p>Original software.<br>Independent thinking.<br>A wider horizon.</p><div class="footer-navigation"><nav aria-label="Company pages">${navLinks.map(([text,path])=>`<a href="${path}">${text}</a>`).join('')}<a href="/engineering/">Our principles</a><a href="/updates/">Company updates</a><a href="/contact/">Contact</a></nav><nav aria-label="Website information"><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/cookies/">Cookie information</a><a href="/security/">Security</a><a href="/disclosures/">Company disclosures</a><a href="/search/">Website search ${arrowRight}</a></nav></div><a class="footer-email" href="mailto:${esc(company.email)}">${esc(company.email)}</a></div><div class="footer-wordmark" aria-hidden="true"><img src="/assets/wordmark.svg" width="1200" height="150" loading="lazy" alt=""></div><div class="corporate-record"><p>${esc(company.legalName)}<span>(One Person Company)</span></p><p>Incorporated in India<br><time datetime="${company.incorporationDate}">${company.incorporationDateLabel}</time></p><p>Corporate Identity Number<br>${company.cin}</p></div><div class="footer-bottom"><span>© ${new Date().getUTCFullYear()} ${esc(company.legalName)}. All rights reserved.</span><a href="#main">Back to top ${arrowUp}</a></div></div></footer><noscript><link rel="stylesheet" href="/no-js.css"></noscript></body></html>`,options.assetVersion);
+}

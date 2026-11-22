@@ -1,0 +1,29 @@
+{
+  "name": "irium-labs",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "dev": "tsx scripts/serve.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@fontsource-variable/archivo": "5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/node": "^24.10.0",
+    "@types/three": "0.187.0",
+    "esbuild": "^0.25.12",
+    "sharp": "0.35.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "three": "0.187.0"
+  }
+}
