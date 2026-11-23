@@ -146,14 +146,12 @@ export function renderSinglePage(page: PublicPage, { siteUrl, publicLaunch, asse
   <link rel="icon" type="image/svg+xml" href="${asset('/assets/favicon.svg')}">
   <link rel="preload" href="${asset('/fonts/archivo-latin.woff2')}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="${asset('/assets/main.css')}">
-  ${missing ? '' : `<script type="module" src="${asset('/assets/circuit-background.js')}"></script>
-  <script type="module" src="${asset('/assets/hero-emblem.js')}"></script>`}
+  ${missing ? '' : `<script type="module" src="${asset('/assets/visual-scenes.js')}"></script>`}
   <script type="application/ld+json">${organizationJson}</script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  ${missing ? '' : `<button class="motion-control" type="button" data-visual-motion>Play motion</button>
-  <div class="site-backdrop" aria-hidden="true">
+  ${missing ? '' : `<div class="site-backdrop" aria-hidden="true">
     <canvas class="circuit-background" data-circuit-background></canvas>
   </div>`}
   <header class="shell site-header">

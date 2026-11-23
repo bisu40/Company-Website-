@@ -166,22 +166,11 @@ export async function buildSite(): Promise<void> {
     legalComments: "none",
     logLevel: "warning",
   });
-  await build({
-    absWorkingDir: projectRoot,
-    entryPoints: ["src/circuit-background.ts"],
-    outfile: path.join(outputRoot, "assets", "circuit-background.js"),
-    bundle: true,
-    format: "esm",
-    target: "es2022",
-    minify: true,
-    legalComments: "none",
-    logLevel: "warning",
-  });
   const officialEmblem = await readFile(path.join(outputRoot, "assets", "mark.svg"), "utf8");
   await build({
     absWorkingDir: projectRoot,
-    entryPoints: ["src/hero-emblem.ts"],
-    outfile: path.join(outputRoot, "assets", "hero-emblem.js"),
+    entryPoints: ["src/circuit-background.ts"],
+    outfile: path.join(outputRoot, "assets", "visual-scenes.js"),
     define: { __IRIUM_EMBLEM_SVG__: JSON.stringify(officialEmblem) },
     bundle: true,
     format: "esm",

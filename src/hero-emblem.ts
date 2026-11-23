@@ -1,41 +1,36 @@
 import {
-  CanvasTexture, Color, DirectionalLight, ExtrudeGeometry, Float32BufferAttribute, Group, HemisphereLight, Mesh,
-  MeshPhysicalMaterial, PerspectiveCamera, Scene, SRGBColorSpace, WebGLRenderer,
+  CanvasTexture, DirectionalLight, ExtrudeGeometry, Float32BufferAttribute, Group, HemisphereLight, Mesh,
+  MeshPhysicalMaterial, PerspectiveCamera, Scene, SRGBColorSpace, Vector2, WebGLRenderer,
 } from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
-import { visualMotionEvent, visualMotionPlaying } from './visual-motion.ts';
 
 declare const __IRIUM_EMBLEM_SVG__: string;
 
-function emblemColor({ data, width, height }: ImageData, u: number, v: number, color: Color): void {
-  const x = Math.max(0, Math.min(width - 1, Math.floor(u * width)));
-  const y = Math.max(0, Math.min(height - 1, Math.floor((1 - v) * height)));
-  let sample = (y * width + x) * 4;
-  if (data[sample + 3]! < 192) {
-    // Bevel vertices can extend just past the painted outline. Use the nearest solid artwork there.
-    let closest = Infinity;
-    for (let sy = Math.max(0, y - 8); sy <= Math.min(height - 1, y + 8); sy++) {
-      for (let sx = Math.max(0, x - 8); sx <= Math.min(width - 1, x + 8); sx++) {
-        const candidate = (sy * width + sx) * 4;
-        const distance = (sx - x) ** 2 + (sy - y) ** 2;
-        if (distance < closest && data[candidate + 3]! >= 192) {
-          sample = candidate;
-          closest = distance;
-        }
-      }
+function violetPosition(surface: HTMLCanvasElement): number {
+  const data = surface.getContext('2d')!.getImageData(0, 0, surface.width, 1).data;
+  let strongest = -Infinity;
+  let violet = 0;
+  for (let x = 0; x < surface.width; x++) {
+    const index = x * 4;
+    const saturation = data[index + 2]! - (data[index]! + data[index + 1]!) / 2;
+    if (saturation > strongest) {
+      strongest = saturation;
+      violet = x;
     }
   }
-  if (data[sample + 3]! === 0) {
-    color.set('#d7e050');
-    return;
-  }
-  color.setRGB(data[sample]! / 255, data[sample + 1]! / 255, data[sample + 2]! / 255, SRGBColorSpace);
+  return (violet + .5) / surface.width;
 }
 
 function buildEmblem(image: HTMLImageElement): Group {
-  // The SVG is baked into the bundle for its contours. The same official SVG image supplies the face colors.
-  const contours = __IRIUM_EMBLEM_SVG__.replace(/\sstyle="[^"]*"/g, '');
-  const { paths, xml } = new SVGLoader().parse(contours);
+  // Use presentation attributes so parsing the official paint respects the site's inline-style policy.
+  const artwork = __IRIUM_EMBLEM_SVG__
+    .replace(/\sstyle="([^"]*)"/g, (_attribute, style: string) =>
+      [...style.matchAll(/(?:^|;)\s*(fill|fill-rule|stop-color|stop-opacity):\s*([^;]+)/g)]
+        .map(([, property, value]) => ` ${property}="${value!.trim()}"`).join(''),
+    )
+    // SVGLoader expects numeric stop offsets and would clamp percentage values above one.
+    .replace(/\boffset="([\d.]+)%"/g, (_attribute, offset: string) => `offset="${Number(offset) / 100}"`);
+  const { paths, xml } = new SVGLoader().parse(artwork);
   const [left = 0, top = 0, width = 1, height = 1] = (xml.getAttribute('viewBox') ?? '').trim().split(/\s+/).map(Number);
   const depth = width * .23;
   const surface = document.createElement('canvas');
@@ -44,7 +39,6 @@ function buildEmblem(image: HTMLImageElement): Group {
   const paint = surface.getContext('2d');
   if (!paint) return new Group();
   paint.drawImage(image, 0, 0, surface.width, surface.height);
-  const pixels = paint.getImageData(0, 0, surface.width, surface.height);
   const texture = new CanvasTexture(surface);
   texture.colorSpace = SRGBColorSpace;
   const polished = { metalness: .13, roughness: .19, clearcoat: 1, clearcoatRoughness: .10 };
@@ -52,29 +46,45 @@ function buildEmblem(image: HTMLImageElement): Group {
     ...polished, map: texture, alphaTest: .45,
     emissive: '#ffffff', emissiveMap: texture, emissiveIntensity: .28,
   });
-  const sides = new MeshPhysicalMaterial({ ...polished, vertexColors: true });
   const emblem = new Group();
   emblem.scale.set(1 / width, -1 / width, 1 / width);
 
   paths.forEach((path, order) => {
     const shapes = path.toShapes();
     if (!shapes.length) return;
+    const paint = SVGLoader.createFillMaterial(path);
+    if (!paint) return;
+    const gradient = paint.map;
+    const projection = gradient?.matrix.clone();
+    const violet = gradient?.image instanceof HTMLCanvasElement ? violetPosition(gradient.image) : 0;
+    if (gradient) {
+      gradient.channel = 1;
+      gradient.matrix.identity();
+    }
+    const sides = new MeshPhysicalMaterial({ ...polished, color: paint.color, map: gradient });
+    paint.dispose();
+
     const geometry = new ExtrudeGeometry(shapes, {
-      depth, curveSegments: 10, bevelEnabled: true, bevelSegments: 3,
+      depth, steps: 3, curveSegments: 10, bevelEnabled: true, bevelSegments: 3,
       bevelThickness: width * .015, bevelSize: width * .004,
     });
     const vertices = geometry.getAttribute('position');
     const uv = geometry.getAttribute('uv');
-    const colors = new Float32Array(vertices.count * 3);
-    const color = new Color();
+    const ribbonUV = new Float32BufferAttribute(new Float32Array(vertices.count * 2), 2);
+    const ribbonPoint = new Vector2();
     for (let vertex = 0; vertex < vertices.count; vertex++) {
-      const u = (vertices.getX(vertex) - left) / width;
-      const v = 1 - (vertices.getY(vertex) - top) / height;
-      uv.setXY(vertex, u, v);
-      emblemColor(pixels, u, v, color);
-      colors.set([color.r, color.g, color.b], vertex * 3);
+      const x = vertices.getX(vertex);
+      const y = vertices.getY(vertex);
+      uv.setXY(vertex, (x - left) / width, 1 - (y - top) / height);
+      if (projection) {
+        ribbonPoint.set(x, y).applyMatrix3(projection);
+        const facePosition = Math.max(0, Math.min(1, ribbonPoint.x));
+        const back = Math.max(0, Math.min(1, (1 - vertices.getZ(vertex) / depth) * 2.5));
+        // Bring violet forward along the walls so it is visible even inside the overlapping ribbons.
+        ribbonUV.setXY(vertex, facePosition + (violet - facePosition) * back, ribbonPoint.y);
+      }
     }
-    geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('uv1', ribbonUV);
     geometry.translate(-left - width / 2, -top - height / 2, -depth / 2 + order * .45);
     emblem.add(new Mesh(geometry, [face, sides]));
   });
@@ -140,7 +150,7 @@ async function initializeHero(canvas: HTMLCanvasElement, image: HTMLImageElement
   }
 
   function syncMotion() {
-    if (!renderingAvailable || !visualMotionPlaying() || !visible || document.hidden) {
+    if (!renderingAvailable || !visible || document.hidden) {
       if (frame !== undefined) cancelAnimationFrame(frame);
       frame = undefined;
       previous = undefined;
@@ -164,7 +174,6 @@ async function initializeHero(canvas: HTMLCanvasElement, image: HTMLImageElement
     resize();
     syncMotion();
   });
-  document.addEventListener(visualMotionEvent, syncMotion);
   document.addEventListener('visibilitychange', syncMotion);
   resize();
   syncMotion();
@@ -172,12 +181,4 @@ async function initializeHero(canvas: HTMLCanvasElement, image: HTMLImageElement
 
 const canvas = document.querySelector<HTMLCanvasElement>('[data-hero-emblem]');
 const image = document.querySelector<HTMLImageElement>('.hero-emblem');
-if (canvas && image) {
-  function start() {
-    if (!visualMotionPlaying()) return;
-    document.removeEventListener(visualMotionEvent, start);
-    void initializeHero(canvas!, image!);
-  }
-  document.addEventListener(visualMotionEvent, start);
-  start();
-}
+if (canvas && image) void initializeHero(canvas, image);

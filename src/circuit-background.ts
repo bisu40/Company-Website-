@@ -1,158 +1,143 @@
-import { initializeVisualMotion, visualMotionEvent, visualMotionPlaying } from './visual-motion.ts';
+import {
+  Mesh, PerspectiveCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer,
+} from 'three';
+import './hero-emblem.ts';
 
-type BoardPoint = readonly [x: number, depth: number];
-type ScreenPoint = readonly [x: number, y: number];
-type Trace = { points: BoardPoint[]; phase: number; velocity: number; color: string };
-
-function boardTraces(): Trace[] {
-  const traces: Trace[] = [];
-  for (let index = 0; index < 52; index++) {
-    const lane = Math.floor(index / 4);
-    const edge = index % 4;
-    const offset = (lane - 6) * .56;
-    const bend = .6 + (lane % 4) * .28;
-    const end = 1.7 + Math.abs(offset) * .48;
-    const points: BoardPoint[] = [
-      [10.9 + (lane % 3) * .26, offset * 1.56],
-      [6.4 + (lane % 5) * .72, offset * 1.56],
-      [5.6 + (lane % 5) * .72, offset * 1.56 + bend],
-      [end + .67, offset * 1.56 + bend],
-      [end, offset * 1.56 + bend - .67],
-    ];
-    traces.push({
-      points: points.map(([x, depth]): BoardPoint => {
-        if (edge === 0) return [x, depth];
-        if (edge === 1) return [-x, -depth];
-        if (edge === 2) return [depth, -x * .73];
-        return [-depth, x * .73];
-      }),
-      phase: (index * .381966) % 1,
-      velocity: .20 + (index % 7) * .018,
-      color: index % 5 === 0 ? '181, 177, 255' : '105, 187, 255',
-    });
+const boardVertex = `
+  uniform float time;
+  varying vec3 board;
+  void main() {
+    vec3 point = position;
+    float wave = sin(point.x * .51 + point.y * .23 - time * .57);
+    point.z += .24 * wave + .13 * sin(point.y * .55 - point.x * .17 + time * .42);
+    board = point;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(point, 1.);
   }
-  return traces;
-}
+`;
 
-function drawCircuit(
-  context: CanvasRenderingContext2D, traces: Trace[], width: number, height: number, time: number,
-): void {
-  const compact = width < 760;
-  const sway = Math.sin(time * .53);
-  const centerX = width * ((compact ? .5 : .735) + sway * .018);
-  const centerY = height * ((compact ? .31 : .55) + Math.sin(time * .43) * .025);
-  const scale = Math.min(width * (compact ? .095 : .061), height * .111);
-  const project = ([x, depth]: BoardPoint): ScreenPoint => {
-    // Perspective divide on an inclined x/z plane. Near traces expand and far traces recede.
-    const horizontal = x + depth * (.42 + sway * .11);
-    const vertical = depth * (.43 + Math.cos(time * .53) * .04) - x * .13;
-    const distance = 1 / (1.12 - depth * .039 + x * .014);
-    return [centerX + horizontal * scale * distance, centerY + vertical * scale * distance];
-  };
-  context.clearRect(0, 0, width, height);
-  context.lineCap = 'round';
-  context.lineJoin = 'round';
+const boardFragment = `
+  uniform float time;
+  varying vec3 board;
 
-  for (let line = -11; line <= 11; line++) {
-    const [leftX, leftY] = project([-13, line]);
-    const [rightX, rightY] = project([13, line]);
-    const [farX, farY] = project([line, -12]);
-    const [nearX, nearY] = project([line, 12]);
-    context.beginPath();
-    context.moveTo(leftX, leftY);
-    context.lineTo(rightX, rightY);
-    context.moveTo(farX, farY);
-    context.lineTo(nearX, nearY);
-    context.strokeStyle = 'rgba(135, 159, 226, .10)';
-    context.lineWidth = .65;
-    context.stroke();
+  float hash(vec2 id) {
+    return fract(sin(dot(id, vec2(127.1, 311.7))) * 43758.5453);
   }
 
-  traces.forEach(({ points, phase, velocity, color }, index) => {
-    const path = points.map(project);
-    const first = path[0]!;
-    const last = path[path.length - 1]!;
-    context.beginPath();
-    context.moveTo(...first);
-    for (const point of path.slice(1)) context.lineTo(...point);
-    context.strokeStyle = `rgba(${color}, ${index % 4 === 0 ? .42 : .25})`;
-    context.lineWidth = index % 4 === 0 ? 1.2 : .78;
-    context.stroke();
-    context.beginPath();
-    context.arc(...last, index % 4 === 0 ? 2.25 : 1.55, 0, Math.PI * 2);
-    context.stroke();
+  float track(float distance, float width, float aa) {
+    return 1. - smoothstep(width - aa, width + aa, distance);
+  }
 
-    if (index % 3 === 1) return;
-    const progress = ((time * velocity + phase) % 1) * (path.length - 1);
-    const segment = Math.min(path.length - 2, Math.floor(progress));
-    const start = path[segment]!;
-    const endPoint = path[segment + 1]!;
-    const travel = progress - segment;
-    const x = start[0] + (endPoint[0] - start[0]) * travel;
-    const y = start[1] + (endPoint[1] - start[1]) * travel;
-    const tail = Math.max(0, travel - .53);
-    const tailX = start[0] + (endPoint[0] - start[0]) * tail;
-    const tailY = start[1] + (endPoint[1] - start[1]) * tail;
-    if (travel > .01) {
-      const streak = context.createLinearGradient(tailX, tailY, x, y);
-      streak.addColorStop(0, `rgba(${color}, 0)`);
-      streak.addColorStop(.65, `rgba(${color}, .36)`);
-      streak.addColorStop(1, `rgba(${color}, .88)`);
-      context.beginPath();
-      context.moveTo(tailX, tailY);
-      context.lineTo(x, y);
-      context.strokeStyle = streak;
-      context.lineWidth = index % 3 === 0 ? 2.2 : 1.4;
-      context.stroke();
-    }
-    const glow = context.createRadialGradient(x, y, 0, x, y, 10);
-    glow.addColorStop(0, `rgba(${color}, .91)`);
-    glow.addColorStop(.28, `rgba(${color}, .42)`);
-    glow.addColorStop(1, `rgba(${color}, 0)`);
-    context.fillStyle = glow;
-    context.fillRect(x - 10, y - 10, 20, 20);
-    context.fillStyle = 'rgba(229, 243, 255, .85)';
-    context.fillRect(x - .8, y - .8, 1.6, 1.6);
-  });
-}
+  float pulse(float coordinate, float clock) {
+    float head = fract(coordinate - clock);
+    return exp(-head * 8.) * smoothstep(.97, 1., head)
+      + exp(-head * 8.) * (1. - smoothstep(.53, .88, head));
+  }
+
+  void main() {
+    vec2 point = board.xy * .90;
+    vec2 cell = floor(point);
+    vec2 local = fract(point);
+    float detail = hash(cell);
+    float row = hash(vec2(cell.y, 3.));
+    float column = hash(vec2(9., cell.x));
+    float aa = clamp(max(fwidth(point.x), fwidth(point.y)) * .6, .002, .034);
+
+    float rowLine = abs(local.y - (.24 + row * .17));
+    float columnLine = abs(local.x - (.67 + column * .11));
+    float horizontal = track(rowLine, .014, aa);
+    float vertical = track(columnLine, .012, aa);
+    float turn = abs(local.y - (.64 + max(0., local.x - .58) * .56));
+    float branch = track(turn, .010, aa)
+      * smoothstep(.08, .1, local.x) * (1. - smoothstep(.78, .8, local.x))
+      * step(.28, detail);
+    float parallel = track(abs(local.y - (.18 + row * .17)), .006, aa)
+      * smoothstep(.04, .07, local.x) * (1. - smoothstep(.52, .58, local.x))
+      * step(.44, detail);
+
+    vec2 pad = abs(local - vec2(.39, .71)) - vec2(.13, .079);
+    float padShape = max(pad.x, pad.y);
+    float chip = (1. - smoothstep(-aa, aa, padShape)) * step(.74, detail);
+    float border = track(abs(padShape), .009, aa) * step(.74, detail);
+    float node = track(length(local - vec2(.67 + column * .11, .24 + row * .17)), .030, aa)
+      * step(.51, detail);
+    float grid = max(track(min(local.x, 1. - local.x), .004, aa), track(min(local.y, 1. - local.y), .004, aa));
+
+    vec3 dark = vec3(.053, .071, .111);
+    float wave = .5 + .5 * sin(point.x * .23 - point.y * .19 - time * .66);
+    vec3 color = dark + vec3(.022, .032, .061) * wave + board.z * vec3(.015, .024, .048);
+    color += vec3(.060, .098, .17) * grid * .24;
+    color += vec3(.043, .077, .135) * (horizontal + vertical * .69 + branch * .87 + parallel * .52);
+    color += vec3(.034, .060, .102) * chip + vec3(.065, .112, .184) * border + vec3(.080, .15, .226) * node;
+
+    float flowX = pulse(point.x * .29 + row, time * (.22 + row * .14));
+    float flowY = pulse(point.y * -.26 + column, time * (.19 + column * .15));
+    float signalX = flowX * horizontal;
+    float signalY = flowY * vertical;
+    float bloom = flowX * exp(-18. * rowLine) + flowY * exp(-22. * columnLine);
+    color += vec3(.053, .103, .197) * bloom * .62;
+    color += vec3(.22, .44, .74) * signalX * .67 + vec3(.17, .43, .57) * signalY * .62;
+    gl_FragColor = vec4(color, 1.);
+  }
+`;
 
 function initializeCircuit(canvas: HTMLCanvasElement): void {
-  const drawingContext = canvas.getContext('2d', { alpha: true });
-  if (!drawingContext) return;
-  const context: CanvasRenderingContext2D = drawingContext;
-  const traces = boardTraces();
-  let width = 0;
-  let height = 0;
+  let renderer: WebGLRenderer;
+  try {
+    const context = canvas.getContext('webgl2', { alpha: false, antialias: false, powerPreference: 'low-power' });
+    if (!context) return;
+    renderer = new WebGLRenderer({ canvas, context, antialias: false });
+  } catch {
+    return;
+  }
+
+  renderer.setClearColor('#151c2d');
+  const scene = new Scene();
+  const camera = new PerspectiveCamera(44, 1, .1, 100);
+  const time = { value: 0 };
+  const material = new ShaderMaterial({
+    uniforms: { time }, vertexShader: boardVertex, fragmentShader: boardFragment,
+    toneMapped: false,
+  });
+  // A subdivided surface provides real depth and keeps the field extending past every viewport edge.
+  const board = new Mesh(new PlaneGeometry(80, 80, 84, 84), material);
+  board.rotation.x = -Math.PI / 2;
+  scene.add(board);
+
   let frame: number | undefined;
   let lastFrame: number | undefined;
-  let elapsed = 0;
+  let available = true;
 
   function paint() {
-    drawCircuit(context, traces, width, height, elapsed);
+    const elapsed = time.value;
+    camera.position.set(Math.sin(elapsed * .29) * .93, 7.6 + Math.sin(elapsed * .34) * .42, 9.3 + Math.sin(elapsed * .23) * .35);
+    camera.lookAt(Math.sin(elapsed * .25) * .34, 0, 0);
+    renderer.render(scene, camera);
+    canvas.dataset.rendered = '';
   }
 
   function resize() {
-    width = canvas.clientWidth;
-    height = canvas.clientHeight;
+    if (!available) return;
+    const { clientWidth: width, clientHeight: height } = canvas;
+    if (!width || !height) return;
     const pixelBudget = 2_000_000;
-    const resolution = Math.min(window.devicePixelRatio || 1, 1.75, Math.sqrt(pixelBudget / (width * height)));
-    canvas.width = Math.max(1, Math.floor(width * resolution));
-    canvas.height = Math.max(1, Math.floor(height * resolution));
-    context.setTransform(resolution, 0, 0, resolution, 0, 0);
+    const ratio = Math.min(devicePixelRatio || 1, 1.6, Math.sqrt(pixelBudget / (width * height)));
+    renderer.setPixelRatio(ratio);
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
     paint();
   }
 
   function tick(now: number) {
     frame = requestAnimationFrame(tick);
-    // Thirty drawings per second are enough for the slow background and limit battery use.
     if (lastFrame !== undefined && now - lastFrame < 31) return;
-    elapsed += lastFrame === undefined ? 0 : Math.min(now - lastFrame, 67) / 1000;
+    time.value += lastFrame === undefined ? 0 : Math.min(now - lastFrame, 67) / 1000;
     lastFrame = now;
     paint();
   }
 
   function syncMotion() {
-    if (!visualMotionPlaying() || document.hidden) {
+    if (!available || document.hidden) {
       if (frame !== undefined) cancelAnimationFrame(frame);
       frame = undefined;
       lastFrame = undefined;
@@ -161,15 +146,21 @@ function initializeCircuit(canvas: HTMLCanvasElement): void {
     }
   }
 
-  resize();
+  canvas.addEventListener('webglcontextlost', () => {
+    available = false;
+    delete canvas.dataset.rendered;
+    syncMotion();
+  });
+  canvas.addEventListener('webglcontextrestored', () => {
+    available = true;
+    resize();
+    syncMotion();
+  });
   window.addEventListener('resize', resize);
-  document.addEventListener(visualMotionEvent, syncMotion);
   document.addEventListener('visibilitychange', syncMotion);
-  document.documentElement.classList.add('circuit-ready');
+  resize();
   syncMotion();
 }
 
-const canvas = document.querySelector<HTMLCanvasElement>('[data-circuit-background]');
-const control = document.querySelector<HTMLButtonElement>('[data-visual-motion]');
-if (control) initializeVisualMotion(control);
-if (canvas) initializeCircuit(canvas);
+const backdrop = document.querySelector<HTMLCanvasElement>('[data-circuit-background]');
+if (backdrop) initializeCircuit(backdrop);

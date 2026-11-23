@@ -88,7 +88,7 @@ test("the homepage ships its own animated backdrop and retains static content an
   const files = await filesBelow(outputRoot);
   for (const filename of files) {
     const relative = path.relative(outputRoot, filename).split(path.sep).join('/');
-    if (!['assets/circuit-background.js', 'assets/hero-emblem.js'].includes(relative)) {
+    if (relative !== 'assets/visual-scenes.js') {
       assert.doesNotMatch(relative, /\.(?:js|mjs|avif|webp|glb|gltf|blend)$|^assets\/(?:chunks|visuals|narrative)\//i);
     }
   }
@@ -104,19 +104,19 @@ test("the homepage ships its own animated backdrop and retains static content an
   assert.match(html, /href="mailto:info@iriumlabs\.org"/);
   assert.match(html, /<canvas\b[^>]*data-circuit-background/);
   assert.match(html, /<canvas\b[^>]*data-hero-emblem/);
-  assert.match(html, /<button\b[^>]*data-visual-motion[^>]*>Play motion<\/button>/);
+  assert.doesNotMatch(html, /class="motion-control"|data-visual-motion|Play motion|Pause motion/);
   assert.match(html, /class="hero-emblem"[^>]*src="\/assets\/mark\.svg\?v=/);
   assert.doesNotMatch(html, /class="(?:hero-wordmark|hero-platform)"/);
   assert.doesNotMatch(html, /irium-depth-(?:valley|foreground)/);
-  const scripts = [...html.matchAll(/<script\b[^>]*src="(\/assets\/(?:circuit-background|hero-emblem)\.js\?v=[a-f0-9]{16})"/g)];
-  assert.equal(scripts.length, 2);
+  const scripts = [...html.matchAll(/<script\b[^>]*src="(\/assets\/visual-scenes\.js\?v=[a-f0-9]{16})"/g)];
+  assert.equal(scripts.length, 1);
   for (const [, script] of scripts) {
     const animation = await getResponse(script!);
     assert.equal(animation.status, 200);
     assert.match(animation.headers["content-type"] ?? "", /^text\/javascript/);
   }
   const missing = (await getResponse("/404.html")).body.toString();
-  assert.doesNotMatch(missing, /data-circuit-background|data-hero-emblem|(?:circuit-background|hero-emblem)\.js/);
+  assert.doesNotMatch(missing, /data-circuit-background|data-hero-emblem|visual-scenes\.js/);
   assert.equal([...html.matchAll(/<details>/g)].length, 5);
 });
 
