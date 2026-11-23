@@ -14,11 +14,11 @@ const outputRoot = path.join(projectRoot, "dist");
 const publicRoot = path.join(projectRoot, "public");
 // A new public file requires an explicit code review; an extension alone is not publication approval.
 const approvedAssetPaths = new Set([
-  "assets/irium-depth-valley.jpg", "assets/irium-depth-foreground.png",
   "fonts/archivo-latin.woff2", "fonts/manrope-latin.woff2",
   "fonts/OFL.txt", "fonts/Archivo-OFL.txt",
 ]);
 const sourceOnlyPublicPaths = new Set([
+  "assets/irium-depth-valley.jpg", "assets/irium-depth-foreground.png",
   "assets/irium-circuit-valley.jpg", "assets/irium-circuit-foreground.png",
   "assets/irium-print.jpg", "assets/irium-signal.jpg",
   "no-js.css", "brand-source/official-lockup.svg", "brand-source/PROVENANCE.md", "assets/visuals/manifest.json",
@@ -164,6 +164,30 @@ export async function buildSite(): Promise<void> {
     external: ["/fonts/*"],
     minify: true,
     legalComments: "none",
+    logLevel: "warning",
+  });
+  await build({
+    absWorkingDir: projectRoot,
+    entryPoints: ["src/circuit-background.ts"],
+    outfile: path.join(outputRoot, "assets", "circuit-background.js"),
+    bundle: true,
+    format: "esm",
+    target: "es2022",
+    minify: true,
+    legalComments: "none",
+    logLevel: "warning",
+  });
+  const officialEmblem = await readFile(path.join(outputRoot, "assets", "mark.svg"), "utf8");
+  await build({
+    absWorkingDir: projectRoot,
+    entryPoints: ["src/hero-emblem.ts"],
+    outfile: path.join(outputRoot, "assets", "hero-emblem.js"),
+    define: { __IRIUM_EMBLEM_SVG__: JSON.stringify(officialEmblem) },
+    bundle: true,
+    format: "esm",
+    target: "es2022",
+    minify: true,
+    legalComments: "eof",
     logLevel: "warning",
   });
   const assetVersion = await outputAssetVersion();

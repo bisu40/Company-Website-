@@ -11,16 +11,24 @@ const work = [
   ['Technology exploration', 'We examine what emerging technologies make possible, how they behave in practice, and where they could improve a real workflow. The work helps us decide which ideas are worth developing further.'],
 ] as const;
 
-function homepage(): string {
+function homepage(asset: (reference: string) => string): string {
   return `
     <section class="hero" aria-labelledby="hero-title">
-      <div class="shell hero-content">
-        <p class="section-label">Independent software and technology research</p>
-        <h1 id="hero-title">Software worth using.</h1>
-        <p class="hero-description">Irium Labs builds original applications and software products. We explore emerging technologies to find better ways for people to work with software.</p>
-        <div class="hero-actions">
-          <a class="action action-primary" href="#work">Explore our work <span aria-hidden="true">↓</span></a>
-          <a class="action" href="#contact">Contact</a>
+      <div class="shell hero-layout">
+        <div class="hero-content">
+          <p class="section-label">Independent software and technology research</p>
+          <h1 id="hero-title">Software<br> worth using.</h1>
+          <p class="hero-description">Irium Labs builds original applications and software products. We explore emerging technologies to find better ways for people to work with software.</p>
+          <div class="hero-actions">
+            <a class="action action-primary" href="#work">Explore our work <span aria-hidden="true">↓</span></a>
+            <a class="action" href="#contact">Contact</a>
+          </div>
+        </div>
+        <div class="hero-brand" aria-hidden="true">
+          <div class="hero-emblem-frame">
+            <img class="hero-emblem" src="${asset('/assets/mark.svg')}" alt="" width="397" height="388">
+            <canvas class="hero-emblem-canvas" data-hero-emblem></canvas>
+          </div>
         </div>
       </div>
     </section>
@@ -122,7 +130,7 @@ export function renderSinglePage(page: PublicPage, { siteUrl, publicLaunch, asse
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b141b">
+  <meta name="theme-color" content="#10121a">
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
   <meta name="robots" content="${publicLaunch && !missing ? 'index,follow' : 'noindex,nofollow'}">
@@ -138,21 +146,15 @@ export function renderSinglePage(page: PublicPage, { siteUrl, publicLaunch, asse
   <link rel="icon" type="image/svg+xml" href="${asset('/assets/favicon.svg')}">
   <link rel="preload" href="${asset('/fonts/archivo-latin.woff2')}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="${asset('/assets/main.css')}">
+  ${missing ? '' : `<script type="module" src="${asset('/assets/circuit-background.js')}"></script>
+  <script type="module" src="${asset('/assets/hero-emblem.js')}"></script>`}
   <script type="application/ld+json">${organizationJson}</script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  ${missing ? '' : `<input class="motion-pause" id="pause-background" type="checkbox" aria-label="Pause background motion">
-  <label class="motion-control" for="pause-background" aria-hidden="true">
-    <span class="motion-running">Pause motion</span>
-    <span class="motion-paused">Resume motion</span>
-  </label>
+  ${missing ? '' : `<button class="motion-control" type="button" data-visual-motion>Play motion</button>
   <div class="site-backdrop" aria-hidden="true">
-    <div class="backdrop-motion">
-      <img src="${asset('/assets/irium-depth-valley.jpg')}" alt="" width="1600" height="900" fetchpriority="high">
-    </div>
-    <div class="backdrop-signal"></div>
-    <img class="backdrop-foreground" src="${asset('/assets/irium-depth-foreground.png')}" alt="" width="1280" height="720" fetchpriority="low">
+    <canvas class="circuit-background" data-circuit-background></canvas>
   </div>`}
   <header class="shell site-header">
     <a class="brand" href="/" aria-label="Irium Labs home">
@@ -160,7 +162,7 @@ export function renderSinglePage(page: PublicPage, { siteUrl, publicLaunch, asse
     </a>
   </header>
   <main id="main" tabindex="-1">
-    ${missing ? `<section class="shell missing"><h1>Page not found.</h1><a class="action" href="/">Back to Irium Labs</a></section>` : homepage()}
+    ${missing ? `<section class="shell missing"><h1>Page not found.</h1><a class="action" href="/">Back to Irium Labs</a></section>` : homepage(asset)}
   </main>
   ${missing ? '' : companyFooter(asset('/assets/brand-horizontal.svg'))}
 </body>

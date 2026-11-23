@@ -84,11 +84,13 @@ test("build emits complete static pages without private files or environment val
   assert.match(await readFile(path.join(outputRoot, "fonts", "Archivo-OFL.txt"), "utf8"), /SIL OPEN FONT LICENSE/);
 });
 
-test("the corporate homepage works through in-page navigation without shipping 3D or browser scripts", async () => {
+test("the homepage ships its own animated backdrop and retains static content and navigation", async () => {
   const files = await filesBelow(outputRoot);
   for (const filename of files) {
     const relative = path.relative(outputRoot, filename).split(path.sep).join('/');
-    assert.doesNotMatch(relative, /\.(?:js|mjs|avif|webp|glb|gltf|blend)$|^assets\/(?:chunks|visuals|narrative)\//i);
+    if (!['assets/circuit-background.js', 'assets/hero-emblem.js'].includes(relative)) {
+      assert.doesNotMatch(relative, /\.(?:js|mjs|avif|webp|glb|gltf|blend)$|^assets\/(?:chunks|visuals|narrative)\//i);
+    }
   }
   const html = (await getResponse("/")).body.toString();
   const header = html.match(/<header\b[^>]*>([\s\S]*?)<\/header>/)?.[1];
@@ -100,7 +102,21 @@ test("the corporate homepage works through in-page navigation without shipping 3
     assert.ok(html.includes(`id="${section}"`));
   }
   assert.match(html, /href="mailto:info@iriumlabs\.org"/);
-  assert.doesNotMatch(html, /<script\b[^>]*\bsrc=|<canvas\b|data-scene|data-motion/i);
+  assert.match(html, /<canvas\b[^>]*data-circuit-background/);
+  assert.match(html, /<canvas\b[^>]*data-hero-emblem/);
+  assert.match(html, /<button\b[^>]*data-visual-motion[^>]*>Play motion<\/button>/);
+  assert.match(html, /class="hero-emblem"[^>]*src="\/assets\/mark\.svg\?v=/);
+  assert.doesNotMatch(html, /class="(?:hero-wordmark|hero-platform)"/);
+  assert.doesNotMatch(html, /irium-depth-(?:valley|foreground)/);
+  const scripts = [...html.matchAll(/<script\b[^>]*src="(\/assets\/(?:circuit-background|hero-emblem)\.js\?v=[a-f0-9]{16})"/g)];
+  assert.equal(scripts.length, 2);
+  for (const [, script] of scripts) {
+    const animation = await getResponse(script!);
+    assert.equal(animation.status, 200);
+    assert.match(animation.headers["content-type"] ?? "", /^text\/javascript/);
+  }
+  const missing = (await getResponse("/404.html")).body.toString();
+  assert.doesNotMatch(missing, /data-circuit-background|data-hero-emblem|(?:circuit-background|hero-emblem)\.js/);
   assert.equal([...html.matchAll(/<details>/g)].length, 5);
 });
 
