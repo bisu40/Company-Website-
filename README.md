@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://iriumlabs.org/"><img src="https://img.shields.io/badge/Website-Official-blue" alt="Official Website"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-blue" alt="Proprietary License"></a>
-  <img src="https://img.shields.io/badge/Company-Private_Limited-blue" alt="Private Limited">
+  <a href="https://github.com/bisu40/Company-Website-/actions"><img src="https://github.com/bisu40/Company-Website-/actions/workflows/pages.yml/badge.svg?branch=main" alt="Deployment Status"></a>
 </p>
 
 <p align="center">
@@ -22,13 +22,7 @@
   <img src="https://img.shields.io/badge/GitHub%20Pages-181717?logo=github&logoColor=white" alt="GitHub Pages">
 </p>
 
-<p align="center">
-  <a href="https://github.com/bisu40/Company-Website-/actions">
-    <img src="https://github.com/bisu40/Company-Website-/actions/workflows/pages.yml/badge.svg?branch=main" alt="Deployment Status">
-  </a>
-</p>
 
----
 
 ## Overview
 
