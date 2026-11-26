@@ -1,25 +1,25 @@
 <p align="center">
   <a href="https://iriumlabs.org/">
-    <img src="https://iriumlabs.org/assets/brand-horizontal.svg" alt="Irium Labs" width="320">
+    <img src="https://iriumlabs.org/assets/brand-horizontal.svg" alt="Irium Labs" width="360">
   </a>
 </p>
 
-<h1 align="center">Irium Labs</h1>
-
-<p align="center">
-  <strong>Official Corporate Website</strong>
-</p>
+<h2 align="center">Official Corporate Website</h2>
 
 <p align="center">
   <a href="https://iriumlabs.org/">iriumlabs.org</a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Website-Official-10121a?style=flat-square" alt="Website"> <img src="https://img.shields.io/badge/License-Proprietary-blue?style=flat-square" alt="License"> <img src="https://img.shields.io/badge/Company-Private%20Limited-blue?style=flat-square" alt="Company">
+  <a href="https://iriumlabs.org/"><img src="https://img.shields.io/badge/Website-Official-blue" alt="Official Website"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-blue" alt="Proprietary License"></a>
+  <img src="https://img.shields.io/badge/Company-Private_Limited-blue" alt="Private Limited">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript"> <img src="https://img.shields.io/badge/Three.js-000000?style=flat-square&logo=three.js&logoColor=white" alt="Three.js"> <img src="https://img.shields.io/badge/GitHub%20Pages-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Pages">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Three.js-000000?logo=three.js&logoColor=white" alt="Three.js">
+  <img src="https://img.shields.io/badge/GitHub%20Pages-181717?logo=github&logoColor=white" alt="GitHub Pages">
 </p>
 
 <p align="center">
@@ -29,7 +29,6 @@
 </p>
 
 ---
-
 
 ## Overview
 
