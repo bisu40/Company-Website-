@@ -219,7 +219,8 @@ test("the homepage and fallback are served with their actual HTTP status", async
   assert.match(aegisPrivacy, /io\.aegis\.vault/);
   assert.match(aegisPrivacy, /RevenueCat/);
   assert.match(aegisPrivacy, /Google Play Billing/);
-  assert.doesNotMatch(aegisPrivacy, /visual-scenes\.js/);
+  assert.match(aegisPrivacy, /data-circuit-background/);
+  assert.match(aegisPrivacy, /visual-scenes\.js/);
   const missing = await getResponse("/there-is-no-such-page/");
   assert.equal(missing.status, 404);
   assert.match(missing.headers["content-type"] ?? "", /^text\/html/);

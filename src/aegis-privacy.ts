@@ -1,6 +1,7 @@
 import { escapeHtml as esc } from './components.ts';
 import { company } from './data.ts';
 import { organizationJson } from './pages.ts';
+import { renderCompanyFooter } from './single-page.ts';
 
 type PageOptions = { siteUrl: string; publicLaunch: boolean; assetVersion: string };
 
@@ -206,49 +207,66 @@ export function renderAegisPrivacyPage({ siteUrl, publicLaunch, assetVersion }: 
   <link rel="icon" type="image/svg+xml" href="${asset('/assets/favicon.svg')}">
   <link rel="preload" href="${asset('/fonts/archivo-latin.woff2')}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="${asset('/assets/main.css')}">
+  <script type="module" src="${asset('/assets/visual-scenes.js')}"></script>
   <script type="application/ld+json">${organizationJson}</script>
 </head>
 <body class="aegis-policy-page">
   <a class="skip-link" href="#main">Skip to content</a>
+  <div class="site-backdrop" aria-hidden="true">
+    <canvas class="circuit-background" data-circuit-background></canvas>
+  </div>
   <header class="shell site-header aegis-policy-header">
     <a class="brand" href="/" aria-label="Irium Labs home">
       <img src="${asset('/assets/brand-horizontal.svg')}" alt="Irium Labs" width="340" height="64">
     </a>
-    <a class="aegis-policy-home-link" href="/">Irium Labs Home</a>
+    <nav class="aegis-policy-nav" aria-label="Primary">
+      <a href="/#company">Company</a>
+      <a href="/#work">What we do</a>
+      <a href="/#contact">Contact</a>
+    </nav>
   </header>
-  <main id="main" tabindex="-1" class="shell aegis-policy-main">
-    <header class="aegis-policy-hero">
-      <p class="section-label">Aegis &middot; Android Package <code>io.aegis.vault</code></p>
-      <h1>Privacy Policy</h1>
-      <p class="aegis-policy-deck">Published by ${esc(company.legalName)} &middot; Effective <time datetime="${AEGIS_PRIVACY_EFFECTIVE_DATE}">${AEGIS_PRIVACY_EFFECTIVE_LABEL}</time></p>
-    </header>
-    <div class="aegis-policy-layout">
-      <aside class="aegis-policy-toc" aria-label="Table of contents">
-        <h2>Contents</h2>
-        <nav>
-          <ul>
-            ${aegisPrivacySections.map(({ id, title: heading }) => `<li><a href="#${esc(id)}">${esc(heading)}</a></li>`).join('\n            ')}
-          </ul>
-        </nav>
-      </aside>
-      <article class="aegis-policy-body">
-        ${aegisPrivacySections.map(({ id, title: heading, body }) => `
-        <section id="${esc(id)}" aria-labelledby="h-${esc(id)}">
-          <h2 id="h-${esc(id)}">${esc(heading)}</h2>
-          ${body.trim()}
-        </section>`).join('\n')}
-      </article>
-    </div>
-  </main>
-  <footer class="site-footer">
-    <div class="shell">
-      <div class="footer-record">
-        <p>${esc(company.legalName)} <span>(One Person Company)</span></p>
-        <p>Privacy contact: ${mail}</p>
-        <p>CIN ${esc(company.cin)} &middot; <a href="/">iriumlabs.org</a></p>
+  <main id="main" tabindex="-1" class="aegis-policy-main">
+    <section class="shell editorial aegis-policy-hero" aria-labelledby="policy-title">
+      <div class="section-heading">
+        <p class="section-label">Aegis &middot; Privacy Policy</p>
+        <h1 class="statement aegis-policy-title" id="policy-title">Privacy Policy</h1>
+        <p class="section-copy">How ${esc(company.legalName)} handles information in connection with the Aegis mobile application (<code>io.aegis.vault</code>).</p>
       </div>
-    </div>
-  </footer>
+      <dl class="company-record aegis-policy-meta">
+        <div><dt>Application</dt><dd>Aegis (<code>io.aegis.vault</code>)</dd></div>
+        <div><dt>Publisher</dt><dd>${esc(company.legalName)}</dd></div>
+        <div><dt>Effective date</dt><dd><time datetime="${AEGIS_PRIVACY_EFFECTIVE_DATE}">${AEGIS_PRIVACY_EFFECTIVE_LABEL}</time></dd></div>
+      </dl>
+    </section>
+    <section class="shell editorial aegis-policy-document" aria-label="Privacy policy document">
+      <div class="aegis-policy-layout">
+        <aside class="aegis-policy-toc" aria-label="Table of contents">
+          <p class="section-label">Contents</p>
+          <nav>
+            <ol>
+              ${aegisPrivacySections.map(({ id, title: heading }) => `<li><a href="#${esc(id)}">${esc(heading)}</a></li>`).join('\n              ')}
+            </ol>
+          </nav>
+        </aside>
+        <details class="aegis-policy-toc-mobile">
+          <summary>Contents (${aegisPrivacySections.length} sections)</summary>
+          <nav aria-label="Table of contents">
+            <ol>
+              ${aegisPrivacySections.map(({ id, title: heading }) => `<li><a href="#${esc(id)}">${esc(heading)}</a></li>`).join('\n              ')}
+            </ol>
+          </nav>
+        </details>
+        <article class="aegis-policy-body">
+          ${aegisPrivacySections.map(({ id, title: heading, body }) => `
+          <section id="${esc(id)}" aria-labelledby="h-${esc(id)}">
+            <h2 id="h-${esc(id)}">${esc(heading)}</h2>
+            ${body.trim()}
+          </section>`).join('\n')}
+        </article>
+      </div>
+    </section>
+  </main>
+  ${renderCompanyFooter(asset('/assets/brand-horizontal.svg'), '/')}
 </body>
 </html>`;
 }

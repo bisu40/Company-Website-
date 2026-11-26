@@ -89,7 +89,7 @@ function homepage(asset: (reference: string) => string): string {
     </section>`;
 }
 
-function companyFooter(brand: string): string {
+export function renderCompanyFooter(brand: string, homePrefix = ''): string {
   return `
     <footer class="site-footer">
       <div class="shell">
@@ -101,10 +101,10 @@ function companyFooter(brand: string): string {
           </div>
           <nav class="footer-links" aria-label="Explore Irium Labs">
             <h2>Explore Irium Labs</h2>
-            <a href="#company">Company</a>
-            <a href="#work">What we do</a>
-            <a href="#research">Research interests</a>
-            <a href="#principles">Engineering principles</a>
+            <a href="${homePrefix}#company">Company</a>
+            <a href="${homePrefix}#work">What we do</a>
+            <a href="${homePrefix}#research">Research interests</a>
+            <a href="${homePrefix}#principles">Engineering principles</a>
           </nav>
           <section class="policies" aria-labelledby="policies-title">
             <h2 id="policies-title">Company and policies</h2>
@@ -162,7 +162,7 @@ export function renderSinglePage(page: PublicPage, { siteUrl, publicLaunch, asse
   <main id="main" tabindex="-1">
     ${missing ? `<section class="shell missing"><h1>Page not found.</h1><a class="action" href="/">Back to Irium Labs</a></section>` : homepage(asset)}
   </main>
-  ${missing ? '' : companyFooter(asset('/assets/brand-horizontal.svg'))}
+  ${missing ? '' : renderCompanyFooter(asset('/assets/brand-horizontal.svg'))}
 </body>
 </html>`;
 }
