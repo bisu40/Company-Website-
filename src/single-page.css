@@ -426,3 +426,135 @@ h1 {
   .contact { gap: 20px; }
   .footer-record { display: grid; }
 }
+
+
+/* === Aegis Privacy Policy (/aegis/privacy) === */
+.aegis-policy-header {
+  justify-content: space-between;
+  gap: 20px;
+}
+.aegis-policy-home-link {
+  font-size: .92rem;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+}
+.aegis-policy-home-link:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.aegis-policy-main {
+  padding-block: clamp(40px, 6vh, 72px) clamp(56px, 8vh, 96px);
+}
+.aegis-policy-hero {
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 36px;
+}
+.aegis-policy-hero h1 {
+  font-family: Archivo, system-ui, sans-serif;
+  font-size: clamp(2.1rem, 4.5vw, 3.2rem);
+  line-height: 1.1;
+  margin-top: 10px;
+}
+.aegis-policy-deck {
+  color: var(--muted);
+  margin-top: 12px;
+  font-size: .98rem;
+}
+.aegis-policy-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+.aegis-policy-toc {
+  position: sticky;
+  top: 24px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.aegis-policy-toc h2 {
+  font-family: Archivo, system-ui, sans-serif;
+  font-size: .92rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.aegis-policy-toc ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.aegis-policy-toc a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .88rem;
+  line-height: 1.4;
+  display: block;
+}
+.aegis-policy-toc a:hover {
+  color: var(--text);
+}
+.aegis-policy-body {
+  display: grid;
+  gap: 32px;
+  max-width: 76ch;
+}
+.aegis-policy-body section {
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgb(53 62 86 / .55);
+}
+.aegis-policy-body section:last-child {
+  border-bottom: none;
+}
+.aegis-policy-body h2 {
+  font-family: Archivo, system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  line-height: 1.3;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.aegis-policy-body p {
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.aegis-policy-body p:last-child {
+  margin-bottom: 0;
+}
+.aegis-policy-body ul {
+  color: var(--muted);
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.aegis-policy-body strong {
+  color: var(--text);
+}
+.aegis-policy-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .88em;
+  background: var(--surface);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+}
+.aegis-policy-body a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+@media (max-width: 860px) {
+  .aegis-policy-layout {
+    grid-template-columns: 1fr;
+  }
+  .aegis-policy-toc {
+    position: static;
+  }
+}

@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { company, publicPages } from "../src/data.ts";
 import { organizationJson } from "../src/pages.ts";
 import { renderSinglePage } from "../src/single-page.ts";
+import { renderAegisPrivacyPage, AEGIS_PRIVACY_PATH } from "../src/aegis-privacy.ts";
 import { getSecurityHeaders } from "../src/security.ts";
 import { writeBrandAssets } from "./brand-assets.ts";
 
@@ -182,13 +183,16 @@ export async function buildSite(): Promise<void> {
   const assetVersion = await outputAssetVersion();
   await writeFile(cssPath, versionCssAssets(await readFile(cssPath, "utf8"), assetVersion), "utf8");
   const pageOptions = { siteUrl, publicLaunch, assetVersion };
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${siteUrl}/</loc></url>\n</urlset>\n`;
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${siteUrl}/</loc></url>\n  <url><loc>${siteUrl}${AEGIS_PRIVACY_PATH}</loc></url>\n</urlset>\n`;
   const robots = publicLaunch ? `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n` : "User-agent: *\nDisallow: /\n";
   const headers = getSecurityHeaders(organizationJson, { publicLaunch, https: siteUrl.startsWith("https:") });
   const headerFile = `/*\n${Object.entries(headers).map(([name, value]) => `  ${name}: ${value}`).join("\n")}\n  Cache-Control: public, max-age=0, must-revalidate\n\n/assets/*\n  Cache-Control: public, max-age=3600\n\n/fonts/*\n  Cache-Control: public, max-age=86400\n\n/404.html\n  X-Robots-Tag: noindex, nofollow\n`;
+  const aegisPrivacyDir = path.join(outputRoot, "aegis", "privacy");
+  await mkdir(aegisPrivacyDir, { recursive: true });
   await Promise.all([
     writeFile(path.join(outputRoot, "index.html"), renderSinglePage(home, pageOptions), "utf8"),
     writeFile(path.join(outputRoot, "404.html"), renderSinglePage(missing, pageOptions), "utf8"),
+    writeFile(path.join(aegisPrivacyDir, "index.html"), renderAegisPrivacyPage(pageOptions), "utf8"),
     writeFile(path.join(outputRoot, "sitemap.xml"), sitemap, "utf8"),
     writeFile(path.join(outputRoot, "robots.txt"), robots, "utf8"),
     writeFile(path.join(outputRoot, "_headers"), headerFile, "utf8"),

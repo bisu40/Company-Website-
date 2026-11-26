@@ -63,7 +63,10 @@ after(async () => {
 test("build emits complete static pages without private files or environment values", async () => {
   const files = await filesBelow(outputRoot);
   const pages = files.filter((filename) => filename.endsWith(".html"));
-  assert.deepEqual(pages.map(filename => path.relative(outputRoot, filename)).sort(), ['404.html', 'index.html']);
+  assert.deepEqual(
+    pages.map(filename => path.relative(outputRoot, filename).split(path.sep).join('/')).sort(),
+    ['404.html', 'aegis/privacy/index.html', 'index.html']
+  );
   for (const filename of files) {
     const relative = path.relative(outputRoot, filename);
     assert.doesNotMatch(relative, /(?:^|[\\/])(?:\.env|\.git|node_modules|src|scripts|tests)(?:[.\\/]|$)|\.(?:ts|map)$/i);
@@ -157,7 +160,10 @@ test("private review robots and sitemap keep unpublished pages out of indexing",
   const robots = await readFile(path.join(outputRoot, "robots.txt"), "utf8");
   const sitemap = await readFile(path.join(outputRoot, "sitemap.xml"), "utf8");
   assert.match(robots, /Disallow: \/\s/);
-  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]), ["https://iriumlabs.org/"]);
+  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]), [
+    "https://iriumlabs.org/",
+    "https://iriumlabs.org/aegis/privacy",
+  ]);
 });
 
 test("every page and its CSS dependencies share one content version", async () => {
@@ -204,11 +210,16 @@ test("identical output assets retain their version across clean builds and priva
 });
 
 test("the homepage and fallback are served with their actual HTTP status", async () => {
-  for (const [route, status] of [["/", 200], ["/404.html", 404], ["/about/", 404]] as const) {
+  for (const [route, status] of [["/", 200], ["/aegis/privacy/", 200], ["/404.html", 404], ["/about/", 404]] as const) {
     const response = await getResponse(route);
     assert.equal(response.status, status, route);
     assert.match(response.headers["content-type"] ?? "", /^text\/html/);
   }
+  const aegisPrivacy = (await getResponse("/aegis/privacy/")).body.toString();
+  assert.match(aegisPrivacy, /io\.aegis\.vault/);
+  assert.match(aegisPrivacy, /RevenueCat/);
+  assert.match(aegisPrivacy, /Google Play Billing/);
+  assert.doesNotMatch(aegisPrivacy, /visual-scenes\.js/);
   const missing = await getResponse("/there-is-no-such-page/");
   assert.equal(missing.status, 404);
   assert.match(missing.headers["content-type"] ?? "", /^text\/html/);
