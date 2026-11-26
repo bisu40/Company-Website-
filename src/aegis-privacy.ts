@@ -220,9 +220,7 @@ export function renderAegisPrivacyPage({ siteUrl, publicLaunch, assetVersion }: 
       <img src="${asset('/assets/brand-horizontal.svg')}" alt="Irium Labs" width="340" height="64">
     </a>
     <nav class="aegis-policy-nav" aria-label="Primary">
-      <a href="/#company">Company</a>
-      <a href="/#work">What we do</a>
-      <a href="/#contact">Contact</a>
+      <a href="/">Home</a>
     </nav>
   </header>
   <main id="main" tabindex="-1" class="aegis-policy-main">

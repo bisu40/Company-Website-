@@ -605,11 +605,7 @@ h1 {
   }
   .aegis-policy-nav {
     flex-wrap: nowrap;
-    gap: 14px;
     font-size: .82rem;
     white-space: nowrap;
-  }
-  .aegis-policy-nav a:nth-child(2) {
-    display: none;
   }
 }
