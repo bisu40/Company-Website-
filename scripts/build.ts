@@ -17,6 +17,7 @@ const publicRoot = path.join(projectRoot, "public");
 const approvedAssetPaths = new Set([
   "fonts/archivo-latin.woff2", "fonts/manrope-latin.woff2",
   "fonts/OFL.txt", "fonts/Archivo-OFL.txt",
+  "assets/aegis-logo.png",
 ]);
 const sourceOnlyPublicPaths = new Set([
   "assets/irium-depth-valley.jpg", "assets/irium-depth-foreground.png",

@@ -225,10 +225,13 @@ export function renderAegisPrivacyPage({ siteUrl, publicLaunch, assetVersion }: 
   </header>
   <main id="main" tabindex="-1" class="aegis-policy-main">
     <section class="shell editorial aegis-policy-hero" aria-labelledby="policy-title">
-      <div class="section-heading">
-        <p class="section-label">Aegis &middot; Privacy Policy</p>
-        <h1 class="statement aegis-policy-title" id="policy-title">Privacy Policy</h1>
-        <p class="section-copy">How ${esc(company.legalName)} handles information in connection with the Aegis mobile application (<code>io.aegis.vault</code>).</p>
+      <div class="product-legal-intro">
+        <img class="product-legal-logo" src="${asset('/assets/aegis-logo.png')}" alt="Aegis application logo" width="88" height="88">
+        <div class="section-heading">
+          <p class="section-label">Aegis &middot; Privacy Policy</p>
+          <h1 class="statement aegis-policy-title" id="policy-title">Privacy Policy</h1>
+          <p class="section-copy">How ${esc(company.legalName)} handles information in connection with the Aegis mobile application (<code>io.aegis.vault</code>).</p>
+        </div>
       </div>
       <dl class="company-record aegis-policy-meta">
         <div><dt>Application</dt><dd>Aegis (<code>io.aegis.vault</code>)</dd></div>

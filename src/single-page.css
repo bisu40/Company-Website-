@@ -654,3 +654,29 @@ h1 {
     font-size: .84rem;
   }
 }
+
+
+/* === Reusable Product-Specific Legal Page Logo Intro === */
+.product-legal-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(18px, 2.6vw, 28px);
+}
+.product-legal-logo {
+  flex: 0 0 auto;
+  width: 88px;
+  height: 88px;
+  border-radius: 18px;
+  object-fit: cover;
+}
+@media (max-width: 560px) {
+  .product-legal-intro {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .product-legal-logo {
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+  }
+}
