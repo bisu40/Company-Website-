@@ -120,6 +120,34 @@ export function renderCompanyFooter(brand: string, homePrefix = ''): string {
     </footer>`;
 }
 
+/** Reusable compact corporate legal footer for product privacy policies, Terms of Service, and legal pages. */
+export function renderCompactLegalFooter(
+  brand: string,
+  options: { currentPath?: string; privacyHref?: string } = {}
+): string {
+  const privacyHref = options.privacyHref ?? '/aegis/privacy/';
+  const isPrivacyCurrent = options.currentPath === privacyHref || options.currentPath === privacyHref.replace(/\/$/, '');
+  const year = new Date().getUTCFullYear();
+  return `
+    <footer class="site-footer site-footer-legal">
+      <div class="shell">
+        <div class="footer-legal-top">
+          <a class="footer-legal-brand" href="/" aria-label="Irium Labs home"><img src="${brand}" alt="Irium Labs" width="340" height="64" loading="lazy"></a>
+          <nav class="footer-legal-links" aria-label="Legal and contact links">
+            <a href="/">Home</a>
+            <a href="${esc(privacyHref)}"${isPrivacyCurrent ? ' aria-current="page"' : ''}>Privacy Policy</a>
+            <a href="mailto:${esc(company.email)}">${esc(company.email)}</a>
+          </nav>
+        </div>
+        <div class="footer-record">
+          <p>${esc(company.legalName)}</p>
+          <p>CIN ${esc(company.cin)}</p>
+          <p>&copy; ${year} ${esc(company.legalName)}. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>`;
+}
+
 export function renderSinglePage(page: PublicPage, { siteUrl, publicLaunch, assetVersion }: PageOptions): string {
   const missing = page.path === '/404.html';
   const title = missing ? page.title : 'Irium Labs | Independent technology';

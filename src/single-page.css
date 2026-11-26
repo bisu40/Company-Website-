@@ -609,3 +609,48 @@ h1 {
     white-space: nowrap;
   }
 }
+
+
+/* === Reusable Compact Corporate Legal Footer === */
+.footer-legal-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 28px;
+  padding-block: 24px;
+}
+.footer-legal-brand {
+  display: block;
+  width: min(100%, 168px);
+}
+.footer-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 24px;
+}
+.footer-legal-links a {
+  color: var(--muted);
+  text-decoration: none;
+  padding-block: 4px;
+}
+.footer-legal-links a:hover,
+.footer-legal-links a[aria-current="page"] {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (max-width: 560px) {
+  .footer-legal-top {
+    padding-block: 20px;
+    gap: 14px 20px;
+  }
+  .footer-legal-brand {
+    width: 128px;
+  }
+  .footer-legal-links {
+    gap: 8px 18px;
+    font-size: .84rem;
+  }
+}

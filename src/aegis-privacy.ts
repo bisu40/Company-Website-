@@ -1,7 +1,7 @@
 import { escapeHtml as esc } from './components.ts';
 import { company } from './data.ts';
 import { organizationJson } from './pages.ts';
-import { renderCompanyFooter } from './single-page.ts';
+import { renderCompactLegalFooter } from './single-page.ts';
 
 type PageOptions = { siteUrl: string; publicLaunch: boolean; assetVersion: string };
 
@@ -148,7 +148,7 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
   },
   {
     id: 'children',
-    title: '14. Children&rsquo;s Privacy',
+    title: '14. Children’s Privacy',
     body: `
       <p>Aegis is a general-audience utility application and is not directed to children under the age of 13 (or the higher minimum digital consent age in your jurisdiction, such as 16 in certain EEA regions or 18 under Indian law where parental consent is required). We do not knowingly collect personal information from children. If you believe a child has sent personal information to us via support email, please contact ${mail} so we can promptly delete it.</p>
     `,
@@ -264,7 +264,7 @@ export function renderAegisPrivacyPage({ siteUrl, publicLaunch, assetVersion }: 
       </div>
     </section>
   </main>
-  ${renderCompanyFooter(asset('/assets/brand-horizontal.svg'), '/')}
+  ${renderCompactLegalFooter(asset('/assets/brand-horizontal.svg'), { currentPath: AEGIS_PRIVACY_PATH, privacyHref: `${AEGIS_PRIVACY_PATH}/` })}
 </body>
 </html>`;
 }
