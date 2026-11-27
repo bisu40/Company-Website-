@@ -11,6 +11,11 @@ export const company = Object.freeze({
   description: 'Irium Labs is an independent technology company incorporated in India. We create original software products and applications and explore emerging technologies with an international vision.',
 });
 
+export const officialPhone = Object.freeze({
+  display: '+91 87966 30606',
+  href: 'tel:+918796630606',
+});
+
 export type Product = {
   readonly id: string;
   readonly name: string;

@@ -1,5 +1,5 @@
 import { escapeHtml as esc } from './components.ts';
-import { company, engineeringPrinciples, researchAreas, type PublicPage } from './data.ts';
+import { company, engineeringPrinciples, officialPhone, researchAreas, type PublicPage } from './data.ts';
 import { renderInlinePolicies } from './legal-content.ts';
 import { organizationJson } from './pages.ts';
 
@@ -83,8 +83,9 @@ function homepage(asset: (reference: string) => string): string {
         <h2 class="statement" id="contact-title">Get in touch with Irium Labs.</h2>
       </div>
       <div>
-        <p class="section-copy">For company enquiries, questions about our work, or potential research collaborations, use our official email address.</p>
+        <p class="section-copy">For company enquiries, questions about our work, or potential research collaborations, use our official email address or business telephone number.</p>
         <a class="contact-link" href="mailto:${esc(company.email)}"><span>${esc(company.email)}</span><span aria-hidden="true">↗</span></a>
+        <a class="contact-link" href="${esc(officialPhone.href)}"><span>${esc(officialPhone.display)}</span><span aria-hidden="true">↗</span></a>
       </div>
     </section>`;
 }
@@ -97,7 +98,8 @@ export function renderCompanyFooter(brand: string, homePrefix = ''): string {
           <div class="footer-identity">
             <a class="footer-brand" href="/" aria-label="Irium Labs home"><img src="${brand}" alt="Irium Labs" width="340" height="64" loading="lazy"></a>
             <p>Original software, applications, and research into emerging technologies.</p>
-            <a class="footer-email" href="mailto:${esc(company.email)}">${esc(company.email)}</a>
+            <a class="footer-email" href="mailto:${esc(company.email)}">${esc(company.email)}</a><br>
+            <a class="footer-email" href="${esc(officialPhone.href)}">${esc(officialPhone.display)}</a>
           </div>
           <nav class="footer-links" aria-label="Explore Irium Labs">
             <h2>Explore Irium Labs</h2>
@@ -123,10 +125,13 @@ export function renderCompanyFooter(brand: string, homePrefix = ''): string {
 /** Reusable compact corporate legal footer for product privacy policies, Terms of Service, and legal pages. */
 export function renderCompactLegalFooter(
   brand: string,
-  options: { currentPath?: string; privacyHref?: string } = {}
+  options: { currentPath?: string; privacyHref?: string; termsHref?: string } = {}
 ): string {
   const privacyHref = options.privacyHref ?? '/aegis/privacy/';
-  const isPrivacyCurrent = options.currentPath === privacyHref || options.currentPath === privacyHref.replace(/\/$/, '');
+  const termsHref = options.termsHref ?? '/aegis/terms/';
+  const normalizedCurrent = options.currentPath?.replace(/\/$/, '');
+  const isPrivacyCurrent = normalizedCurrent === privacyHref.replace(/\/$/, '');
+  const isTermsCurrent = normalizedCurrent === termsHref.replace(/\/$/, '');
   const year = new Date().getUTCFullYear();
   return `
     <footer class="site-footer site-footer-legal">
@@ -135,8 +140,10 @@ export function renderCompactLegalFooter(
           <a class="footer-legal-brand" href="/" aria-label="Irium Labs home"><img src="${brand}" alt="Irium Labs" width="340" height="64" loading="lazy"></a>
           <nav class="footer-legal-links" aria-label="Legal and contact links">
             <a href="/">Home</a>
-            <a href="${esc(privacyHref)}"${isPrivacyCurrent ? ' aria-current="page"' : ''}>Privacy Policy</a>
+            <a href="${esc(privacyHref)}"${isPrivacyCurrent ? ' aria-current="page"' : ''}>Aegis Privacy Policy</a>
+            <a href="${esc(termsHref)}"${isTermsCurrent ? ' aria-current="page"' : ''}>Aegis Terms of Service</a>
             <a href="mailto:${esc(company.email)}">${esc(company.email)}</a>
+            <a href="${esc(officialPhone.href)}">${esc(officialPhone.display)}</a>
           </nav>
         </div>
         <div class="footer-record">

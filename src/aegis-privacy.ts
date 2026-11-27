@@ -1,5 +1,5 @@
 import { escapeHtml as esc } from './components.ts';
-import { company } from './data.ts';
+import { company, officialPhone } from './data.ts';
 import { organizationJson } from './pages.ts';
 import { renderCompactLegalFooter } from './single-page.ts';
 
@@ -16,6 +16,8 @@ export const AEGIS_PRIVACY_EFFECTIVE_DATE = '2026-11-27';
 export const AEGIS_PRIVACY_EFFECTIVE_LABEL = '27 November 2026';
 
 const mail = `<a href="mailto:${esc(company.email)}">${esc(company.email)}</a>`;
+const grievanceMail = `<a href="mailto:grievance@iriumlabs.org">grievance@iriumlabs.org</a>`;
+const phoneLink = `<a href="${esc(officialPhone.href)}">${esc(officialPhone.display)}</a>`;
 const siteLink = `<a href="${esc(company.domain)}">${esc(company.domain)}</a>`;
 
 export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
@@ -32,7 +34,7 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
     title: '2. Summary of Data Collection and Processing',
     body: `
       <p>Aegis is designed as an on-device encrypted vault. <strong>We do not operate cloud storage for your vault files, we do not require you to create an Irium Labs account, and Aegis does not upload your photos, videos, documents, private Notes, filenames, thumbnails, PINs, or encryption keys to any Irium Labs server.</strong></p>
-      <p>However, Aegis is <strong>not</strong> completely network-isolated: when you view subscription plans, start a free trial, purchase or restore a subscription, or verify active entitlement, Aegis communicates with external subscription services — specifically <strong>Google Play Billing</strong> (on Android), <strong>Apple App Store / StoreKit</strong> (where supported on iOS), and <strong>RevenueCat</strong> — which process purchase history and an anonymous subscription identifier (<code>$RCAnonymousID</code>) needed to deliver, verify, and measure subscriptions.</p>
+      <p>However, Aegis is <strong>not</strong> completely network-isolated: when you view subscription plans, start a free trial, purchase or restore a subscription, verify active entitlement, or redeem an optional complimentary access code, Aegis communicates with external subscription or verification services — specifically <strong>Google Play Billing</strong> (on Android), <strong>Apple App Store / StoreKit</strong> (where supported on iOS), <strong>RevenueCat</strong>, and (only when you submit an optional complimentary access code) an Irium Labs verification service hosted on <strong>Cloudflare Workers</strong> — which process purchase history, a pseudonymous app-user identifier (<code>$RCAnonymousID</code>), and technical request/device metadata needed to deliver, verify, and protect entitlements.</p>
       <p>Aegis does not include third-party advertising SDKs, behavioral analytics trackers, or cross-app ad tracking.</p>
     `,
   },
@@ -113,10 +115,11 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
       <p>Aegis offers optional auto-renewing subscriptions (<strong>Aegis Premium</strong> — Annual and Monthly plans, with an introductory 3-day free trial for eligible new customers as determined by the app store).</p>
       <p>Subscription billing and entitlement verification are processed by:</p>
       <ul>
-        <li><strong>Google Play Billing (Google LLC):</strong> Handles payment processing, localized pricing, tax, free-trial eligibility, renewals, cancellations, and refunds on Android under Google&rsquo;s Privacy Policy (<a href="https://policies.google.com/privacy" rel="noopener noreferrer">policies.google.com/privacy</a>). Irium Labs never receives your payment card or bank details.</li>
-        <li><strong>RevenueCat, Inc. (<code>react-native-purchases</code> SDK):</strong> Used as a service provider to validate store receipts/purchase tokens, synchronize subscription entitlement status (<code>aegis_premium</code>), and provide aggregated subscription analytics (such as trial starts, renewals, and cancellations). Because Aegis does not use user accounts, does not collect custom customer attributes (such as name or email), does not call device/advertising identifier collection APIs, and enables no optional third-party attribution integrations, RevenueCat operates solely with an anonymous app-user identifier (<code>$RCAnonymousID</code>) and store purchase history under RevenueCat&rsquo;s Privacy Policy (<a href="https://www.revenuecat.com/privacy" rel="noopener noreferrer">revenuecat.com/privacy</a>).</li>
+        <li><strong>Google Play Billing:</strong> Operated by the applicable regional Google contracting and billing entity (such as Google LLC, Google Ireland Limited, or Google Asia Pacific Pte. Ltd., depending on your country or region). Handles payment processing, localized pricing, tax, free-trial eligibility, renewals, cancellations, and refunds on Android under Google&rsquo;s Privacy Policy (<a href="https://policies.google.com/privacy" rel="noopener noreferrer">policies.google.com/privacy</a>). Irium Labs never receives your payment card or bank details.</li>
+        <li><strong>RevenueCat, Inc. (<code>react-native-purchases</code> SDK):</strong> Used as a service provider to validate store receipts/purchase tokens, synchronize subscription entitlement status (<code>aegis_premium</code>), and provide aggregated subscription analytics (such as trial starts, renewals, and cancellations). Because Aegis does not use user accounts, does not collect custom customer attributes (such as name or email), does not call device/advertising identifier collection APIs, and enables no optional third-party attribution integrations, RevenueCat processes a <strong>pseudonymous app-user identifier</strong> (<code>$RCAnonymousID</code>), store purchase history/receipts, and standard SDK technical metadata (app version, operating-system/platform version, SDK version, and transient IP-derived country code, with raw IP addresses not persisted by RevenueCat) under RevenueCat&rsquo;s Privacy Policy (<a href="https://www.revenuecat.com/privacy" rel="noopener noreferrer">revenuecat.com/privacy</a>).</li>
+        <li><strong>Complimentary Access Code Verification (Optional — Cloudflare Workers &amp; RevenueCat):</strong> If you choose to redeem an optional complimentary or review access code from the Aegis subscription screen, the submitted request payload sent over HTTPS/TLS contains strictly the access code you enter and your pseudonymous RevenueCat app-user identifier (<code>$RCAnonymousID</code>) to an Irium Labs verification service hosted on <strong>Cloudflare Workers</strong> (with automatic Workers invocation logging disabled). Separate from the submitted payload, as with any HTTPS request, ordinary network metadata &mdash; including the connecting device&rsquo;s IP address and standard transport/TLS headers &mdash; is transiently processed by Cloudflare edge and Worker infrastructure to route traffic and enforce failed-attempt rate limiting (15-minute window). The service processes requests solely to validate code eligibility, enforce rate limiting, duplicate-redemption protection, and daily abuse caps, confirm via RevenueCat that no active paid store subscription is overwritten, and request a time-limited promotional entitlement (<code>aegis_premium</code>) through RevenueCat. No raw access codes, raw IP addresses, or raw <code>$RCAnonymousID</code> values are stored in the service&rsquo;s Durable Object database; only salted cryptographic hashes and minimized security audit records (redemption outcome and grant expiry timestamp) are stored. Activity-triggered cleanup targets <strong>30-day</strong> retention by pruning older audit rows during subsequent verification activity, meaning records may remain longer in the absence of subsequent verification activity rather than being deleted on a guaranteed fixed timer. No vault files, photos, videos, documents, Notes, filenames, thumbnails, PINs, biometrics, or Recovery Keys are ever transmitted.</li>
       </ul>
-      <p>All network traffic between Aegis and subscription services is encrypted in transit using HTTPS/TLS.</p>
+      <p>All network traffic between Aegis and subscription or verification services is encrypted in transit using HTTPS/TLS.</p>
     `,
   },
   {
@@ -124,7 +127,8 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
     title: '11. Data Sharing and Third-Party Service Providers',
     body: `
       <p>We do not sell your personal information, do not share your personal data for cross-context behavioral advertising, and never share your vault contents with any third party.</p>
-      <p>Limited subscription and technical metadata is processed only by the third-party infrastructure providers required to deliver subscriptions (Google Play Billing, Apple App Store where applicable, and RevenueCat) and by our email provider if you voluntarily contact us at ${mail}. We may also disclose non-vault administrative records if required by applicable law or lawful government request (note that we do not possess your encrypted vault contents or keys and therefore cannot produce them).</p>
+      <p><strong>Company-Controlled Service Providers:</strong> Limited subscription, entitlement-verification, and support/grievance metadata is processed only by third-party infrastructure providers required to deliver subscriptions, optional complimentary access, or consumer support &mdash; specifically Google Play Billing, Apple App Store (where applicable), RevenueCat, Cloudflare Workers (strictly when an optional access code is redeemed), and our email and business telephony providers if you contact us via ${mail}, ${grievanceMail}, or ${phoneLink} (including formal grievance records, telephone complaint logs, complaint correspondence, and billing references such as store order IDs). We may also disclose non-vault administrative records if required by applicable law or lawful government request (note that we do not possess your encrypted vault contents or keys and therefore cannot produce them).</p>
+      <p><strong>User-Initiated Exports, Sharing, and Backups:</strong> Company-controlled sharing described above is distinct from actions you initiate yourself. If you choose to export decrypted files back to your device, share items through your operating system&rsquo;s share sheet, or save an encrypted <code>.aegisbackup</code> archive to a third-party cloud storage app or external medium, that transfer occurs solely at your direction and is governed by the third-party provider&rsquo;s own terms and privacy policy.</p>
     `,
   },
   {
@@ -134,7 +138,7 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
       <ul>
         <li><strong>Vault Data (On-Device):</strong> Retained solely on your device until you delete individual items, use <em>Settings &rarr; Reset Vault</em>, or uninstall Aegis. Uninstalling Aegis permanently removes app-private encrypted vault storage on the device (exported backups you saved elsewhere remain under your control).</li>
         <li><strong>Non-Hostage Policy After Subscription Expiration:</strong> If your Aegis Premium subscription expires or is cancelled, <strong>your existing encrypted vault remains accessible on your device</strong>. You can continue to unlock your vault, view existing items, export files back to your device, and create/restore backups. An active subscription is only required to import new files.</li>
-        <li><strong>Subscription &amp; Support Records:</strong> Purchase and entitlement records held by Google Play and RevenueCat are retained according to their respective retention schedules and legal/tax obligations. Support emails sent to ${mail} are retained only as long as needed to respond to your enquiry and meet legal obligations.</li>
+        <li><strong>Subscription, Verification &amp; Grievance/Support Records:</strong> Purchase and entitlement records held by Google Play and RevenueCat are retained according to their respective retention schedules and legal/tax obligations. Minimized, salted-hash security audit records from optional complimentary access-code verification use activity-triggered cleanup targeting 30-day retention in Cloudflare Durable Object storage (records are pruned during subsequent verification activity and may remain longer in the absence of subsequent activity; failed-attempt rate-limit windows expire after 15 minutes). General support emails sent to ${mail} are retained only as long as needed to respond to your enquiry and meet legal obligations. Formal consumer grievance records, telephone complaint logs received via ${phoneLink}, complaint correspondence sent to ${grievanceMail}, and associated billing references are retained for <strong>three years</strong> from closure under Irium Labs&rsquo; internal complaint-record retention policy, subject to longer retention where required by applicable law, regulatory inquiry, or legal holds.</li>
       </ul>
     `,
   },
@@ -150,14 +154,15 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
     id: 'children',
     title: '14. Children’s Privacy',
     body: `
-      <p>Aegis is a general-audience utility application and is not directed to children under the age of 13 (or the higher minimum digital consent age in your jurisdiction, such as 16 in certain EEA regions or 18 under Indian law where parental consent is required). We do not knowingly collect personal information from children. If you believe a child has sent personal information to us via support email, please contact ${mail} so we can promptly delete it.</p>
+      <p>Aegis is intended strictly for adults aged <strong>18 years and older</strong> (or the higher legal age of majority in your jurisdiction) and is not directed to minors under 18. We do not knowingly collect personal information from anyone under 18. If you believe a minor under 18 has provided personal information to us via support email, grievance correspondence, or telephone, please contact ${mail} or ${grievanceMail} so we can promptly review and delete it where permitted by law.</p>
     `,
   },
   {
     id: 'international',
     title: '15. International Data Transfers',
     body: `
-      <p>Irium Labs is incorporated in India. While your vault contents remain on your device, subscription verification through Google Play and RevenueCat involves processing on servers located in the United States and other countries where those providers operate. Those providers maintain their own cross-border transfer mechanisms and contractual safeguards.</p>
+      <p>Irium Labs is incorporated in India. While your private vault contents remain locally on your device, subscription verification, optional complimentary access-code verification, and support/grievance communications may involve processing on servers outside your country of residence &mdash; including in the United States, the European Union, and other jurisdictions where <strong>Google Play</strong>, <strong>Apple</strong> (where applicable), <strong>RevenueCat, Inc.</strong>, <strong>Cloudflare, Inc.</strong>, and our email or telephony service providers operate.</p>
+      <p>Each third-party provider documents its own cross-border transfer mechanisms (such as Standard Contractual Clauses or Data Privacy Framework certifications, where applicable) in its published privacy policy and data processing terms. Irium Labs does not independently warrant or certify third-party transfer frameworks beyond those providers&rsquo; published commitments.</p>
     `,
   },
   {
@@ -174,7 +179,9 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
       <p><strong>Publisher &amp; Data Controller:</strong> ${esc(company.legalName)}<br>
       <strong>Corporate Identity Number:</strong> ${esc(company.cin)}<br>
       <strong>Website:</strong> ${siteLink}<br>
-      <strong>Privacy Contact:</strong> ${mail}</p>
+      <strong>Privacy &amp; Support Contact:</strong> ${mail}<br>
+      <strong>Official Business &amp; Support Telephone:</strong> ${phoneLink}</p>
+      <p><strong>Designated Grievance Officer:</strong> Biswajit Mondal, Director &amp; Grievance Officer &mdash; ${grievanceMail} &middot; ${phoneLink}</p>
       <p><strong>Effective Date:</strong> <time datetime="${AEGIS_PRIVACY_EFFECTIVE_DATE}">${AEGIS_PRIVACY_EFFECTIVE_LABEL}</time>. We may update this Privacy Policy when Aegis&rsquo;s features, third-party SDKs, or legal requirements change. The updated version will be published at this URL with a revised effective date.</p>
     `,
   },
@@ -221,6 +228,7 @@ export function renderAegisPrivacyPage({ siteUrl, publicLaunch, assetVersion }: 
     </a>
     <nav class="aegis-policy-nav" aria-label="Primary">
       <a href="/">Home</a>
+      <a href="/aegis/terms/">Terms of Service</a>
     </nav>
   </header>
   <main id="main" tabindex="-1" class="aegis-policy-main">
@@ -267,7 +275,7 @@ export function renderAegisPrivacyPage({ siteUrl, publicLaunch, assetVersion }: 
       </div>
     </section>
   </main>
-  ${renderCompactLegalFooter(asset('/assets/brand-horizontal.svg'), { currentPath: AEGIS_PRIVACY_PATH, privacyHref: `${AEGIS_PRIVACY_PATH}/` })}
+  ${renderCompactLegalFooter(asset('/assets/brand-horizontal.svg'), { currentPath: AEGIS_PRIVACY_PATH, privacyHref: `${AEGIS_PRIVACY_PATH}/`, termsHref: '/aegis/terms/' })}
 </body>
 </html>`;
 }

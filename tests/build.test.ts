@@ -65,7 +65,7 @@ test("build emits complete static pages without private files or environment val
   const pages = files.filter((filename) => filename.endsWith(".html"));
   assert.deepEqual(
     pages.map(filename => path.relative(outputRoot, filename).split(path.sep).join('/')).sort(),
-    ['404.html', 'aegis/privacy/index.html', 'index.html']
+    ['404.html', 'aegis/privacy/index.html', 'aegis/terms/index.html', 'index.html']
   );
   for (const filename of files) {
     const relative = path.relative(outputRoot, filename);
@@ -163,6 +163,7 @@ test("private review robots and sitemap keep unpublished pages out of indexing",
   assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]), [
     "https://iriumlabs.org/",
     "https://iriumlabs.org/aegis/privacy",
+    "https://iriumlabs.org/aegis/terms/",
   ]);
 });
 
@@ -210,7 +211,7 @@ test("identical output assets retain their version across clean builds and priva
 });
 
 test("the homepage and fallback are served with their actual HTTP status", async () => {
-  for (const [route, status] of [["/", 200], ["/aegis/privacy/", 200], ["/404.html", 404], ["/about/", 404]] as const) {
+  for (const [route, status] of [["/", 200], ["/aegis/privacy/", 200], ["/aegis/terms/", 200], ["/404.html", 404], ["/about/", 404]] as const) {
     const response = await getResponse(route);
     assert.equal(response.status, status, route);
     assert.match(response.headers["content-type"] ?? "", /^text\/html/);
@@ -221,6 +222,60 @@ test("the homepage and fallback are served with their actual HTTP status", async
   assert.match(aegisPrivacy, /Google Play Billing/);
   assert.match(aegisPrivacy, /data-circuit-background/);
   assert.match(aegisPrivacy, /visual-scenes\.js/);
+  assert.match(aegisPrivacy, /href="\/aegis\/terms\/"/);
+  assert.match(aegisPrivacy, /Complimentary Access Code Verification/i);
+  assert.match(aegisPrivacy, /Cloudflare Workers/i);
+  assert.match(aegisPrivacy, /pseudonymous app-user identifier/i);
+  assert.match(aegisPrivacy, /30-day/i);
+  assert.match(aegisPrivacy, /15-minute window/i);
+  assert.match(aegisPrivacy, /ordinary network metadata/i);
+  assert.match(aegisPrivacy, /may remain longer in the absence of subsequent/i);
+  assert.match(aegisPrivacy, /three years/i);
+  assert.match(aegisPrivacy, /18 years and older/i);
+  assert.doesNotMatch(aegisPrivacy, /90 days|Cloudflare KV|access\.iriumlabs\.org/i);
+  const aegisTerms = (await getResponse("/aegis/terms/")).body.toString();
+  assert.match(aegisTerms, /<link rel="canonical" href="https:\/\/iriumlabs\.org\/aegis\/terms\/">/);
+  assert.match(aegisTerms, /io\.aegis\.vault/);
+  assert.match(aegisTerms, /IRIUM LABS \(OPC\) PRIVATE LIMITED/);
+  assert.match(aegisTerms, /U62010DL2026OPC467844/);
+  assert.match(aegisTerms, /Third Floor, Mr\. Balraj Singh Lohiya House No\. 170, Kh No\. 393, G\/F, L\/S, Village Ghitorni, Gadaipur, South West Delhi, New Delhi, Delhi, India, 110030/);
+  assert.equal([...aegisTerms.matchAll(/Registered Office:/g)].length, 1);
+  assert.match(aegisTerms, /USD 9\.99 per month/);
+  assert.match(aegisTerms, /USD 39\.99 per year/);
+  assert.match(aegisTerms, /https:\/\/play\.google\.com\/store\/account\/subscriptions/);
+  assert.match(aegisTerms, /adults aged <strong>18 years and older<\/strong>/i);
+  assert.match(aegisTerms, /Distinction from App-Store Content Ratings/i);
+  assert.match(aegisTerms, /Optional Access-Code Verification/i);
+  assert.doesNotMatch(aegisTerms, /remains disabled pending live verification/i);
+  assert.match(aegisTerms, /grievance@iriumlabs\.org/);
+  assert.match(aegisTerms, /Biswajit Mondal/);
+  assert.match(aegisTerms, /Director &amp; Grievance Officer/);
+  assert.match(aegisTerms, /48 hours/);
+  assert.match(aegisTerms, /one calendar month/);
+  assert.match(aegisTerms, /internal professional\/business use/);
+  assert.match(aegisTerms, /regional Google contracting and billing entity/);
+  assert.match(aegisTerms, /ordinary network metadata/);
+  // Privacy-safe contact & telephone checks: allowlist ONLY the authorized official business phone and emails
+  const telLinks = [...new Set([...aegisTerms.matchAll(/href="tel:([^"]+)"/gi)].map((m) => m[1]))];
+  assert.deepEqual(telLinks, ["+918796630606"], "Only the authorized business telephone link may appear on Terms");
+  const visibleTermsText = aegisTerms
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/U62010DL2026OPC467844/g, " ");
+  const unauthorizedPhoneSequences = (visibleTermsText.match(/(?:\+?\d[\d\s().-]{7,}\d)/g) ?? [])
+    .filter((candidate) => candidate.replace(/\D/g, "").length >= 8 && candidate.replace(/\D/g, "") !== "918796630606");
+  assert.deepEqual(unauthorizedPhoneSequences, [], "Terms page must not display any unauthorized telephone numbers");
+  const privacyTelLinks = [...new Set([...aegisPrivacy.matchAll(/href="tel:([^"]+)"/gi)].map((m) => m[1]))];
+  assert.deepEqual(privacyTelLinks, ["+918796630606"], "Only the authorized business telephone link may appear on Privacy Policy");
+  const foundEmails = [...new Set(visibleTermsText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) ?? [])].sort();
+  assert.deepEqual(foundEmails, ["grievance@iriumlabs.org", "info@iriumlabs.org"]);
+  const mailtoEmails = [...new Set([...aegisTerms.matchAll(/href="mailto:([^"]+)"/g)].map((m) => m[1]))].sort();
+  assert.deepEqual(mailtoEmails, ["grievance@iriumlabs.org", "info@iriumlabs.org"]);
+  assert.match(aegisTerms, /non-hostage policy/i);
+  assert.match(aegisTerms, /href="\/aegis\/privacy\/"/);
+  assert.match(aegisTerms, /data-circuit-background/);
+  assert.match(aegisTerms, /visual-scenes\.js/);
+  assert.equal([...aegisTerms.matchAll(/<h2 id="h-/g)].length, 26);
   const missing = await getResponse("/there-is-no-such-page/");
   assert.equal(missing.status, 404);
   assert.match(missing.headers["content-type"] ?? "", /^text\/html/);
@@ -327,6 +382,44 @@ test("public disclosures include only the verified incorporation facts", async (
   assert.match(html, /\(One Person Company\)/);
   assert.doesNotMatch(html, /(?:PAN|TAN)\s*(?:number|:)|Certificate\.pdf|company identification number[^<]*require owner confirmation/i);
   assert.doesNotMatch(html, /datetime="undefined"|Corporate Identity Number: undefined/);
+});
+
+test("Aegis Terms of Service and Privacy Policy cross-link with accessible structure and legal integrity", async () => {
+  const termsHtml = (await getResponse("/aegis/terms/")).body.toString();
+  const privacyHtml = (await getResponse("/aegis/privacy/")).body.toString();
+
+  // Verify all 26 TOC links match their target section IDs in static HTML (readable without JavaScript)
+  const sectionIds = [...termsHtml.matchAll(/<section id="([^"]+)" aria-labelledby="h-\1">/g)].map((m) => m[1]);
+  assert.equal(sectionIds.length, 26);
+  for (const id of sectionIds) {
+    assert.ok(termsHtml.includes(`href="#${id}"`), `Missing TOC link for #${id}`);
+  }
+
+  // Verify required corporate legal footer elements and bidirectional cross-links
+  for (const [label, html, currentHref] of [
+    ["Terms", termsHtml, "/aegis/terms/"],
+    ["Privacy", privacyHtml, "/aegis/privacy/"],
+  ] as const) {
+    const footer = html.match(/<footer class="site-footer site-footer-legal">([\s\S]*?)<\/footer>/)?.[1];
+    assert.ok(footer, `${label} missing compact legal footer`);
+    assert.match(footer, /brand-horizontal\.svg/);
+    assert.match(footer, /Irium Labs \(OPC\) Private Limited/);
+    assert.match(footer, /CIN U62010DL2026OPC467844/);
+    assert.match(footer, /&copy;\s*\d{4}\s*Irium Labs \(OPC\) Private Limited/);
+    assert.match(footer, /<a href="\/">Home<\/a>/);
+    assert.match(footer, /<a href="\/aegis\/privacy\/"[^>]*>Aegis Privacy Policy<\/a>/);
+    assert.match(footer, /<a href="\/aegis\/terms\/"[^>]*>Aegis Terms of Service<\/a>/);
+    assert.match(footer, /href="mailto:info@iriumlabs\.org"/);
+    assert.ok(
+      footer.includes(`href="${currentHref}" aria-current="page"`),
+      `${label} footer must mark ${currentHref} with aria-current="page"`
+    );
+  }
+
+  // Verify no prohibited absolute security claims, no secrets, no external scripts
+  assert.doesNotMatch(termsHtml, /unhackable|100%\s*secure|military-grade/i);
+  assert.doesNotMatch(termsHtml, /REVIEWER_CODE|sk_[a-zA-Z0-9]+/);
+  assert.doesNotMatch(termsHtml, /<script[^>]+src="https?:\/\//i);
 });
 
 test("public indexing requires an explicit launch flag and uses the validated origin", async () => {
