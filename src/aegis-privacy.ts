@@ -19,6 +19,9 @@ const mail = `<a href="mailto:${esc(company.email)}">${esc(company.email)}</a>`;
 const grievanceMail = `<a href="mailto:grievance@iriumlabs.org">grievance@iriumlabs.org</a>`;
 const phoneLink = `<a href="${esc(officialPhone.href)}">${esc(officialPhone.display)}</a>`;
 const siteLink = `<a href="${esc(company.domain)}">${esc(company.domain)}</a>`;
+const contactSectionRef = `<a href="#contact-updates">Section 17 (Contact Information and Policy Updates)</a>`;
+const REGISTERED_OFFICE_ADDRESS =
+  'Third Floor, Mr. Balraj Singh Lohiya House No. 170, Kh No. 393, G/F, L/S, Village Ghitorni, Gadaipur, South West Delhi, New Delhi, Delhi, India, 110030';
 
 export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
   {
@@ -26,7 +29,7 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
     title: '1. Company and Application Identity',
     body: `
       <p>This Privacy Policy explains how <strong>${esc(company.legalName)}</strong> (incorporated in ${esc(company.country)}, Corporate Identity Number <code>${esc(company.cin)}</code>, website ${siteLink}) handles information in connection with the mobile application <strong>Aegis</strong> (Android package identifier: <code>io.aegis.vault</code>).</p>
-      <p>References to &ldquo;Irium Labs,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo; refer to ${esc(company.legalName)}. For any privacy questions or requests, contact us at ${mail}.</p>
+      <p>References to &ldquo;Irium Labs,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo; refer to ${esc(company.legalName)}. For privacy enquiries or formal consumer grievances, see ${contactSectionRef}.</p>
     `,
   },
   {
@@ -127,7 +130,7 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
     title: '11. Data Sharing and Third-Party Service Providers',
     body: `
       <p>We do not sell your personal information, do not share your personal data for cross-context behavioral advertising, and never share your vault contents with any third party.</p>
-      <p><strong>Company-Controlled Service Providers:</strong> Limited subscription, entitlement-verification, and support/grievance metadata is processed only by third-party infrastructure providers required to deliver subscriptions, optional complimentary access, or consumer support &mdash; specifically Google Play Billing, Apple App Store (where applicable), RevenueCat, Cloudflare Workers (strictly when an optional access code is redeemed), and our email and business telephony providers if you contact us via ${mail}, ${grievanceMail}, or ${phoneLink} (including formal grievance records, telephone complaint logs, complaint correspondence, and billing references such as store order IDs). We may also disclose non-vault administrative records if required by applicable law or lawful government request (note that we do not possess your encrypted vault contents or keys and therefore cannot produce them).</p>
+      <p><strong>Company-Controlled Service Providers:</strong> Limited subscription, entitlement-verification, and support/grievance metadata is processed only by third-party infrastructure providers required to deliver subscriptions, optional complimentary access, or consumer support &mdash; specifically Google Play Billing, Apple App Store (where applicable), RevenueCat, Cloudflare Workers (strictly when an optional access code is redeemed), and our email and business telephony providers if you contact us through the support or grievance channels listed in ${contactSectionRef} (including formal grievance records, telephone complaint logs, complaint correspondence, and billing references such as store order IDs). We may also disclose non-vault administrative records if required by applicable law or lawful government request (note that we do not possess your encrypted vault contents or keys and therefore cannot produce them).</p>
       <p><strong>User-Initiated Exports, Sharing, and Backups:</strong> Company-controlled sharing described above is distinct from actions you initiate yourself. If you choose to export decrypted files back to your device, share items through your operating system&rsquo;s share sheet, or save an encrypted <code>.aegisbackup</code> archive to a third-party cloud storage app or external medium, that transfer occurs solely at your direction and is governed by the third-party provider&rsquo;s own terms and privacy policy.</p>
     `,
   },
@@ -138,7 +141,7 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
       <ul>
         <li><strong>Vault Data (On-Device):</strong> Retained solely on your device until you delete individual items, use <em>Settings &rarr; Reset Vault</em>, or uninstall Aegis. Uninstalling Aegis permanently removes app-private encrypted vault storage on the device (exported backups you saved elsewhere remain under your control).</li>
         <li><strong>Non-Hostage Policy After Subscription Expiration:</strong> If your Aegis Premium subscription expires or is cancelled, <strong>your existing encrypted vault remains accessible on your device</strong>. You can continue to unlock your vault, view existing items, export files back to your device, and create/restore backups. An active subscription is only required to import new files.</li>
-        <li><strong>Subscription, Verification &amp; Grievance/Support Records:</strong> Purchase and entitlement records held by Google Play and RevenueCat are retained according to their respective retention schedules and legal/tax obligations. Minimized, salted-hash security audit records from optional complimentary access-code verification use activity-triggered cleanup targeting 30-day retention in Cloudflare Durable Object storage (records are pruned during subsequent verification activity and may remain longer in the absence of subsequent activity; failed-attempt rate-limit windows expire after 15 minutes). General support emails sent to ${mail} are retained only as long as needed to respond to your enquiry and meet legal obligations. Formal consumer grievance records, telephone complaint logs received via ${phoneLink}, complaint correspondence sent to ${grievanceMail}, and associated billing references are retained for <strong>three years</strong> from closure under Irium Labs&rsquo; internal complaint-record retention policy, subject to longer retention where required by applicable law, regulatory inquiry, or legal holds.</li>
+        <li><strong>Subscription, Verification &amp; Grievance/Support Records:</strong> Purchase and entitlement records held by Google Play and RevenueCat are retained according to their respective retention schedules and legal/tax obligations. Minimized, salted-hash security audit records from optional complimentary access-code verification use activity-triggered cleanup targeting 30-day retention in Cloudflare Durable Object storage (records are pruned during subsequent verification activity and may remain longer in the absence of subsequent activity; failed-attempt rate-limit windows expire after 15 minutes). General support enquiries are retained only as long as needed to respond to your enquiry and meet legal obligations. Formal consumer grievance records, telephone complaint logs, grievance correspondence, and associated billing references (submitted via the channels in ${contactSectionRef}) are retained for <strong>three years</strong> from closure under Irium Labs&rsquo; internal complaint-record retention policy, subject to longer retention where required by applicable law, regulatory inquiry, or legal holds.</li>
       </ul>
     `,
   },
@@ -147,14 +150,14 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
     title: '13. Your Privacy Rights and Regional Disclosures',
     body: `
       <p>Depending on your jurisdiction — including India (Digital Personal Data Protection Act, 2023), the European Economic Area / UK (GDPR / UK GDPR), and US state privacy laws (such as CCPA/CPRA) — you may have rights to access, correct, delete, or restrict processing of personal data we control, or to withdraw consent.</p>
-      <p>Because your vault data is stored exclusively on your device, you exercise direct control over accessing, exporting, and deleting it within Aegis. To request access to or deletion of any subscription-identifier records held via RevenueCat or support correspondence held by Irium Labs, email ${mail} with your anonymous RevenueCat app-user ID (if applicable) or enquiry details. Manage or cancel subscriptions directly through Google Play Store settings.</p>
+      <p>Because your vault data is stored exclusively on your device, you exercise direct control over accessing, exporting, and deleting it within Aegis. To request access to or deletion of any subscription-identifier records held via RevenueCat or support/grievance correspondence held by Irium Labs, contact us via ${contactSectionRef} with your enquiry details and applicable purchase verification. Manage or cancel subscriptions directly through Google Play Store settings.</p>
     `,
   },
   {
     id: 'children',
     title: '14. Children’s Privacy',
     body: `
-      <p>Aegis is intended strictly for adults aged <strong>18 years and older</strong> (or the higher legal age of majority in your jurisdiction) and is not directed to minors under 18. We do not knowingly collect personal information from anyone under 18. If you believe a minor under 18 has provided personal information to us via support email, grievance correspondence, or telephone, please contact ${mail} or ${grievanceMail} so we can promptly review and delete it where permitted by law.</p>
+      <p>Aegis is intended strictly for adults aged <strong>18 years and older</strong> (or the higher legal age of majority in your jurisdiction) and is not directed to minors under 18. We do not knowingly collect personal information from anyone under 18. If you believe a minor under 18 has provided personal information to us via support email, grievance correspondence, or telephone, please contact us via ${contactSectionRef} so we can promptly review and delete it where permitted by law.</p>
     `,
   },
   {
@@ -177,11 +180,14 @@ export const aegisPrivacySections: readonly PolicySection[] = Object.freeze([
     title: '17. Contact Information and Policy Updates',
     body: `
       <p><strong>Publisher &amp; Data Controller:</strong> ${esc(company.legalName)}<br>
-      <strong>Corporate Identity Number:</strong> ${esc(company.cin)}<br>
-      <strong>Website:</strong> ${siteLink}<br>
-      <strong>Privacy &amp; Support Contact:</strong> ${mail}<br>
-      <strong>Official Business &amp; Support Telephone:</strong> ${phoneLink}</p>
-      <p><strong>Designated Grievance Officer:</strong> Biswajit Mondal, Director &amp; Grievance Officer &mdash; ${grievanceMail} &middot; ${phoneLink}</p>
+      <strong>Corporate Identity Number (CIN):</strong> <code>${esc(company.cin)}</code><br>
+      <strong>Registered Office:</strong> ${esc(REGISTERED_OFFICE_ADDRESS)}<br>
+      <strong>Official Website:</strong> ${siteLink}</p>
+      <ul>
+        <li><strong>Shared Official Business, Support &amp; Grievance Telephone:</strong> ${phoneLink}</li>
+        <li><strong>Privacy &amp; General Support Enquiries:</strong> ${mail} &mdash; for privacy questions, data-rights enquiries, and general application support.</li>
+        <li><strong>Formal Consumer Grievances (Designated Grievance Officer):</strong> <strong>Biswajit Mondal</strong>, Director &amp; Grievance Officer, ${esc(company.legalName)} &mdash; ${grievanceMail} (or by telephone via the shared official number above).</li>
+      </ul>
       <p><strong>Effective Date:</strong> <time datetime="${AEGIS_PRIVACY_EFFECTIVE_DATE}">${AEGIS_PRIVACY_EFFECTIVE_LABEL}</time>. We may update this Privacy Policy when Aegis&rsquo;s features, third-party SDKs, or legal requirements change. The updated version will be published at this URL with a revised effective date.</p>
     `,
   },

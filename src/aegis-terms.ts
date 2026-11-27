@@ -21,6 +21,7 @@ export const REGISTERED_OFFICE_ADDRESS =
 const mail = `<a href="mailto:${esc(company.email)}">${esc(company.email)}</a>`;
 const grievanceMail = `<a href="mailto:grievance@iriumlabs.org">grievance@iriumlabs.org</a>`;
 const phoneLink = `<a href="${esc(officialPhone.href)}">${esc(officialPhone.display)}</a>`;
+const contactRef = `<a href="#contact">Section 26 (Contact, Consumer Support, and Grievance Redressal)</a>`;
 const siteLink = `<a href="${esc(company.domain)}/">${esc(company.domain)}/</a>`;
 const privacyLink = `<a href="/aegis/privacy/">Aegis Privacy Policy</a>`;
 const googlePlaySubsLink = `<a href="https://play.google.com/store/account/subscriptions" rel="noopener noreferrer">Google Play Subscriptions</a>`;
@@ -182,7 +183,7 @@ export const aegisTermsSections: readonly TermsSection[] = Object.freeze([
     body: `
       <p>Routine cancellation stops future renewal charges as described in Section 13 and is separate from refund requests and statutory withdrawal rights.</p>
       <ul>
-        <li><strong>Google Play Refund Requests:</strong> Because Google Play processes Android billing, refund requests are handled in accordance with ${googlePlayRefundPolicyLink}. You may submit a request via Google&rsquo;s official process to ${googlePlayRefundRequestLink}, or contact us at ${mail} with your Google Play order number if you need assistance with a billing issue or statutory refund claim.</li>
+        <li><strong>Google Play Refund Requests:</strong> Because Google Play processes Android billing, refund requests are handled in accordance with ${googlePlayRefundPolicyLink}. You may submit a request via Google&rsquo;s official process to ${googlePlayRefundRequestLink}, or contact our support or grievance channels (see ${contactRef}) with your Google Play order number if you need assistance with a billing issue or statutory refund claim.</li>
         <li><strong>Future iOS Refund Requests (Conditional):</strong> For future Apple App Store purchases, refund requests will be submitted directly to Apple via ${appleRefundLink}.</li>
       </ul>
       <p><strong>Statutory Consumer &amp; Withdrawal Rights Preserved:</strong> Nothing in these Terms creates an absolute &ldquo;no-refund&rdquo; policy or waives any non-waivable right you have under applicable consumer protection laws. Depending on where you live, you may have mandatory rights &mdash; including statutory cooling-off or withdrawal rights for distance digital contracts (such as the 14-day right of withdrawal in the European Union, EEA, and United Kingdom where applicable), statutory conformity guarantees and remedies for defective digital content or services (including under EU Directive 2019/770, the UK Consumer Rights Act 2015, the Australian Consumer Law, the Indian Consumer Protection Act, 2019, Canadian provincial consumer protection laws, and applicable US federal and state subscription laws). Accepting these Terms does not automatically waive any statutory withdrawal period or mandatory consumer remedy.</p>
@@ -285,7 +286,7 @@ export const aegisTermsSections: readonly TermsSection[] = Object.freeze([
     body: `
       <p>Irium Labs is incorporated in India. Subject to the mandatory consumer protections below, these Terms are governed by the laws of <strong>India</strong>, without regard to conflict-of-laws principles.</p>
       <p><strong>Mandatory International Consumer Rights Preserved:</strong> If you are a consumer residing outside India &mdash; including in the European Union, the European Economic Area, the United Kingdom, the United States, Australia, or Canada &mdash; nothing in these Terms deprives you of the protection of mandatory consumer laws in your country or state of residence, or restricts any mandatory right you have to bring or defend legal proceedings in the courts of your place of residence.</p>
-      <p><strong>Informal Resolution:</strong> Before initiating formal legal proceedings, we encourage you to contact us at ${mail} with a description of your concern so we have an opportunity to resolve the matter promptly and in good faith.</p>
+      <p><strong>Informal Resolution:</strong> Before initiating formal legal proceedings, we encourage you to contact us using the support or grievance channels in ${contactRef} with a description of your concern so we have an opportunity to resolve the matter promptly and in good faith.</p>
     `,
   },
   {
@@ -300,20 +301,18 @@ export const aegisTermsSections: readonly TermsSection[] = Object.freeze([
     id: 'contact',
     title: '26. Contact, Consumer Support, and Grievance Redressal',
     body: `
-      <p><strong>Legal Entity:</strong> IRIUM LABS (OPC) PRIVATE LIMITED<br>
+      <p><strong>Company Identity:</strong><br>
+      <strong>Legal Entity:</strong> IRIUM LABS (OPC) PRIVATE LIMITED<br>
       <strong>Corporate Identification Number (CIN):</strong> <code>${esc(company.cin)}</code><br>
       <strong>Registered Office:</strong> ${esc(REGISTERED_OFFICE_ADDRESS)}<br>
-      <strong>Official Website:</strong> ${siteLink}<br>
-      <strong>General Support &amp; Consumer Enquiries:</strong> ${mail}<br>
-      <strong>Official Business &amp; Support Telephone:</strong> ${phoneLink}</p>
-      <p><strong>Designated Grievance Officer:</strong><br>
-      <strong>Name:</strong> Biswajit Mondal<br>
-      <strong>Designation:</strong> Director &amp; Grievance Officer<br>
-      <strong>Company:</strong> IRIUM LABS (OPC) PRIVATE LIMITED<br>
-      <strong>Grievance Email:</strong> ${grievanceMail}<br>
-      <strong>Grievance Telephone:</strong> ${phoneLink}</p>
-      <p><strong>How to Contact Us &amp; Grievance Handling:</strong> For general application support, technical questions, or subscription enquiries, email ${mail} or call ${phoneLink}. For formal consumer grievances, billing disputes, refund complaints, or statutory rights requests, you may submit a complaint either by email to ${grievanceMail} or by telephone at ${phoneLink}. Formal consumer complaints received via ${grievanceMail} or ${phoneLink} are logged into our grievance register, acknowledged within <strong>48 hours</strong> with a unique complaint reference number (together with a recorded copy of the complaint where required by applicable law), and addressed within <strong>one calendar month</strong> from the date of receipt in accordance with applicable consumer protection rules.</p>
-      <p>To help us assist you, please include your device model, operating-system version, Aegis version, and (for billing or refund enquiries) your app-store order reference. <strong>For your security, never include your PIN, Recovery Key, or private vault files in any support or grievance email.</strong></p>
+      <strong>Official Website:</strong> ${siteLink}</p>
+      <ul>
+        <li><strong>Shared Official Business, Customer Support &amp; Grievance Telephone:</strong> ${phoneLink}</li>
+        <li><strong>General Application Support &amp; Enquiries:</strong> ${mail} &mdash; for technical assistance, account-free usage questions, and general subscription enquiries.</li>
+        <li><strong>Formal Consumer Grievances (Designated Grievance Officer):</strong> <strong>Biswajit Mondal</strong>, Director &amp; Grievance Officer, IRIUM LABS (OPC) PRIVATE LIMITED &mdash; ${grievanceMail} (or by telephone via the shared official number above) for formal consumer grievances, billing disputes, refund complaints, and statutory rights requests.</li>
+      </ul>
+      <p><strong>Grievance Handling Timelines:</strong> Formal consumer complaints submitted by email or telephone are logged into our grievance register, acknowledged within <strong>48 hours</strong> with a unique complaint reference number (together with a recorded copy of the complaint where required by applicable law), and addressed within <strong>one calendar month</strong> from the date of receipt in accordance with applicable consumer protection rules.</p>
+      <p>To help us assist you, please include your device model, operating-system version, Aegis version, and (for billing or refund enquiries) your app-store order reference. <strong>For your security, never include your PIN, Recovery Key, or private vault files in any support or grievance communication.</strong></p>
     `,
   },
 ]);

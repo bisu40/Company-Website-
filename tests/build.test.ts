@@ -409,12 +409,20 @@ test("Aegis Terms of Service and Privacy Policy cross-link with accessible struc
     assert.match(footer, /<a href="\/">Home<\/a>/);
     assert.match(footer, /<a href="\/aegis\/privacy\/"[^>]*>Aegis Privacy Policy<\/a>/);
     assert.match(footer, /<a href="\/aegis\/terms\/"[^>]*>Aegis Terms of Service<\/a>/);
-    assert.match(footer, /href="mailto:info@iriumlabs\.org"/);
+    assert.doesNotMatch(footer, /mailto:|tel:/, `${label} compact legal footer should not repeat contact links`);
     assert.ok(
       footer.includes(`href="${currentHref}" aria-current="page"`),
       `${label} footer must mark ${currentHref} with aria-current="page"`
     );
   }
+
+  // Verify consolidated single-display contact discipline on both Aegis legal pages
+  assert.equal([...termsHtml.matchAll(/\+91 87966 30606/g)].length, 1, "Terms must display official telephone exactly once");
+  assert.equal([...privacyHtml.matchAll(/\+91 87966 30606/g)].length, 1, "Privacy Policy must display official telephone exactly once");
+  assert.equal([...termsHtml.matchAll(/href="mailto:info@iriumlabs\.org"/g)].length, 1, "Terms must display general support email once in Section 26");
+  assert.equal([...termsHtml.matchAll(/href="mailto:grievance@iriumlabs\.org"/g)].length, 1, "Terms must display grievance email once in Section 26");
+  assert.equal([...privacyHtml.matchAll(/href="mailto:info@iriumlabs\.org"/g)].length, 1, "Privacy Policy must display privacy/support email once in Section 17");
+  assert.equal([...privacyHtml.matchAll(/href="mailto:grievance@iriumlabs\.org"/g)].length, 1, "Privacy Policy must display grievance email once in Section 17");
 
   // Verify no prohibited absolute security claims, no secrets, no external scripts
   assert.doesNotMatch(termsHtml, /unhackable|100%\s*secure|military-grade/i);

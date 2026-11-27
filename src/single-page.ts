@@ -98,8 +98,7 @@ export function renderCompanyFooter(brand: string, homePrefix = ''): string {
           <div class="footer-identity">
             <a class="footer-brand" href="/" aria-label="Irium Labs home"><img src="${brand}" alt="Irium Labs" width="340" height="64" loading="lazy"></a>
             <p>Original software, applications, and research into emerging technologies.</p>
-            <a class="footer-email" href="mailto:${esc(company.email)}">${esc(company.email)}</a><br>
-            <a class="footer-email" href="${esc(officialPhone.href)}">${esc(officialPhone.display)}</a>
+            <a class="footer-email" href="mailto:${esc(company.email)}">${esc(company.email)}</a>
           </div>
           <nav class="footer-links" aria-label="Explore Irium Labs">
             <h2>Explore Irium Labs</h2>
@@ -138,12 +137,10 @@ export function renderCompactLegalFooter(
       <div class="shell">
         <div class="footer-legal-top">
           <a class="footer-legal-brand" href="/" aria-label="Irium Labs home"><img src="${brand}" alt="Irium Labs" width="340" height="64" loading="lazy"></a>
-          <nav class="footer-legal-links" aria-label="Legal and contact links">
+          <nav class="footer-legal-links" aria-label="Legal navigation">
             <a href="/">Home</a>
             <a href="${esc(privacyHref)}"${isPrivacyCurrent ? ' aria-current="page"' : ''}>Aegis Privacy Policy</a>
             <a href="${esc(termsHref)}"${isTermsCurrent ? ' aria-current="page"' : ''}>Aegis Terms of Service</a>
-            <a href="mailto:${esc(company.email)}">${esc(company.email)}</a>
-            <a href="${esc(officialPhone.href)}">${esc(officialPhone.display)}</a>
           </nav>
         </div>
         <div class="footer-record">
